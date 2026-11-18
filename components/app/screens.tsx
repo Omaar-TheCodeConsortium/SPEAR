@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { BadgeCheck, Check, Clock, IdCard, KeyRound, Receipt, Smartphone, Truck, Wifi } from "lucide-react";
+import { BadgeCheck, BellRing, CalendarPlus, Check, Clock, IdCard, KeyRound, Receipt, RefreshCw, Smartphone, BedDouble, Truck, Wifi, WifiOff } from "lucide-react";
 
 // The SPEAR screens shown on the site, rebuilt from the team's Stitch designs with sample data.
 // Each fills the 1136 × 700 content area of <AppShell>. Elements a demo changes carry data-d names;
@@ -581,6 +581,13 @@ export function RestaurantScreen() {
         </Card>
       </div>
       <Toast d="rs-toast" icon={<Receipt size={16} />} title="Room 402 · Julian Vance" line="$409.82 from Azure Bistro added to the folio" />
+      {/* Used by the offline POS demo */}
+      <div data-d="rs-offline" className={`absolute left-[330px] top-8 z-30 flex h-11 items-center gap-2.5 rounded-full bg-espresso px-5 text-[13px] font-semibold text-linen shadow-[0_12px_28px_-10px_rgba(34,27,22,0.5)] ${HIDDEN}`}>
+        <WifiOff size={16} className="text-brass" /> <span data-d="rs-offline-text">Internet down · this till is trading on its own</span>
+      </div>
+      <div data-d="rs-online" className={`absolute left-[330px] top-8 z-30 flex h-11 items-center gap-2.5 rounded-full bg-sage-deep px-5 text-[13px] font-semibold text-white shadow-[0_12px_28px_-10px_rgba(34,27,22,0.5)] ${HIDDEN}`}>
+        <RefreshCw size={16} /> Back online · 3 sales and 1 room charge synced
+      </div>
     </div>
   );
 }
@@ -757,3 +764,228 @@ export function HousekeepingScreen() {
     </div>
   );
 }
+
+/* ---------- Hotel PMS: a booking assigned, a charge posted, checkout ---------- */
+
+type PmsRoom = { name: string; type: string; status?: [string, Tone]; stay?: { from: number; nights: number; who: string; look: string } };
+const PMS_ROOMS: PmsRoom[] = [
+  { name: "Room 301", type: "Deluxe king", status: ["Occupied", "neutral"], stay: { from: 0, nights: 4, who: "Hannah Brooks", look: "bg-sage/20 text-sage-deep" } },
+  { name: "Room 302", type: "Deluxe twin", status: ["Clean", "sage"], stay: { from: 2, nights: 3, who: "Kenji Watanabe", look: "bg-parchment text-espresso" } },
+  { name: "Room 303", type: "Deluxe king", status: ["Occupied", "neutral"], stay: { from: 0, nights: 2, who: "Amira Haddad", look: "bg-sage/20 text-sage-deep" } },
+  { name: "Room 304", type: "Junior suite", status: ["Clean", "sage"], stay: { from: 4, nights: 3, who: "Luca Moretti", look: "bg-brass text-espresso" } },
+  { name: "Room 305", type: "Deluxe king" },
+  { name: "Room 306", type: "Deluxe twin", status: ["Turnover", "rust"], stay: { from: 3, nights: 2, who: "Priya Raman", look: "bg-parchment text-espresso" } },
+];
+
+const LANE = "relative h-[58px] flex-1 rounded-md bg-parchment/40";
+const stayPos = (from: number, nights: number) => ({ left: from * DAY_W + 3, width: nights * DAY_W - 6 });
+
+export function PmsScreen() {
+  return (
+    <div className="flex h-full flex-col gap-5 p-7">
+      <Head
+        label="Hotel PMS"
+        title="Reservations"
+        right={
+          <>
+            <Chip tone="brass" className="px-3 py-1.5 text-[12px]">Occupancy 86%</Chip>
+            <Chip d="pm-assign" className="px-3 py-1.5 text-[12px]">1 to assign</Chip>
+          </>
+        }
+      />
+      <div className="grid min-h-0 flex-1 grid-cols-[1fr_340px] gap-5">
+        <Card d="pm-cal" className="p-4">
+          <div className="flex">
+            <div className="w-[150px] flex-none" />
+            {DAYS.map(([day, date], i) => (
+              <div key={date} className={`mx-0.5 flex-none rounded-md py-1.5 text-center ${i === 1 ? "bg-brass/15 text-brass-deep" : "bg-parchment/60 text-taupe"}`} style={{ width: DAY_W - 4 }}>
+                <span className="block text-[11px] font-semibold uppercase">{day}</span>
+                <span className="block text-[16px] font-semibold">{date}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-2 flex items-center border-b border-dashed border-brass/40 pb-2">
+            <div className="w-[150px] flex-none pr-2">
+              <p className="text-[13px] font-semibold">To assign</p>
+              <p className="text-[11px] text-taupe">From every channel</p>
+            </div>
+            <div className={LANE}>
+              <span
+                data-d="pm-new"
+                className={`absolute top-1 z-10 flex h-[50px] flex-col justify-center overflow-hidden rounded-md border border-dashed border-brass bg-brass/20 px-3 text-espresso ${HIDDEN}`}
+                style={stayPos(1, 3)}
+              >
+                <span className="truncate text-[12px] font-semibold">Daniel Okafor</span>
+                <span className="truncate text-[11px] opacity-80">Booking.com · 3 nights</span>
+              </span>
+            </div>
+          </div>
+          {PMS_ROOMS.map((room) => {
+            const free = !room.stay;
+            return (
+              <div key={room.name} className="mt-1.5 flex items-center">
+                <div className="relative w-[150px] flex-none pr-2">
+                  <p className="text-[13px] font-semibold">{room.name}</p>
+                  {free ? (
+                    <span className="relative block h-5">
+                      <Chip tone="sage" d="pm-st-clean" className="absolute left-0 top-0.5">Clean</Chip>
+                      <Chip d="pm-st-occ" className={`absolute left-0 top-0.5 ${HIDDEN}`}>Occupied</Chip>
+                      <Chip tone="rust" d="pm-st-dirty" className={`absolute left-0 top-0.5 ${HIDDEN}`}>To clean</Chip>
+                    </span>
+                  ) : (
+                    <Chip tone={room.status![1]} className="mt-0.5">{room.status![0]}</Chip>
+                  )}
+                </div>
+                <div className={LANE}>
+                  {room.stay ? (
+                    <span className={`absolute top-1 flex h-[50px] flex-col justify-center overflow-hidden rounded-md px-3 ${room.stay.look}`} style={stayPos(room.stay.from, room.stay.nights)}>
+                      <span className="truncate text-[12px] font-semibold">{room.stay.who}</span>
+                      <span className="truncate text-[11px] opacity-80">{room.stay.nights} nights</span>
+                    </span>
+                  ) : (
+                    <span data-d="pm-slot" className={`absolute top-1 h-[50px] rounded-md border-2 border-dashed border-brass/70 bg-brass/10 ${HIDDEN}`} style={stayPos(1, 3)} />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </Card>
+
+        <Card className="relative overflow-hidden">
+          <div data-d="pm-empty" className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-10 text-center text-taupe">
+            <CalendarPlus size={28} />
+            <p className="font-semibold">Drop a booking on a room to see the guest and their folio</p>
+          </div>
+          <div data-d="pm-guest" className={`absolute inset-0 flex flex-col p-5 ${HIDDEN}`}>
+            <div className="flex items-center justify-between">
+              <Label>Room 305 · Deluxe king</Label>
+              <Chip tone="brass" d="pm-when">Arriving tonight</Chip>
+            </div>
+            <div className="mt-3 flex items-center gap-3">
+              <Avatar initials="DO" tone="brass" />
+              <div>
+                <p className="flex items-center gap-2 font-semibold">
+                  Daniel Okafor <Chip>Booking.com</Chip>
+                </p>
+                <p className="text-[12px] text-taupe">Thu 4 – Sun 7 Oct · 2 previous stays</p>
+              </div>
+            </div>
+            <div className="mt-4 rounded-md bg-parchment/60 p-3">
+              <Label>Remembered from last time</Label>
+              <p className="mt-2 flex flex-wrap gap-1.5">
+                <Chip tone="brass">Quiet room</Chip>
+                <Chip tone="brass">Feather-free pillows</Chip>
+                <Chip tone="brass">Vegetarian</Chip>
+              </p>
+            </div>
+            <Label className="mt-4">Folio</Label>
+            <div className="mt-1 text-[13px]">
+              <p className="flex justify-between border-b border-line-soft py-2"><span>Room, 3 nights × $289</span><span className="tabular-nums">$867.00</span></p>
+              <p data-d="pm-charge" className={`flex justify-between rounded border-b border-line-soft px-1 py-2 ${HIDDEN}`}>
+                <span>
+                  <span className="block font-semibold">Azure Bistro · Table 4</span>
+                  <span className="block text-[11px] text-taupe">Sent from the restaurant till</span>
+                </span>
+                <span className="font-semibold tabular-nums">$126.40</span>
+              </p>
+            </div>
+            <p data-d="pm-total-box" className="mt-3 flex items-baseline justify-between rounded-md">
+              <span className="font-semibold">Folio total</span>
+              <span data-d="pm-total" className="text-[22px] font-semibold tabular-nums">$867.00</span>
+            </p>
+            <span className="relative mt-auto block">
+              <Btn tone="dark" d="pm-checkout" className="h-12 w-full text-[14px]">Check out and settle</Btn>
+              <span data-d="pm-settled" className={`absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-sage text-[14px] font-semibold text-white ${HIDDEN}`}>
+                <Check size={16} strokeWidth={3} /> Paid · $993.40 settled
+              </span>
+            </span>
+          </div>
+        </Card>
+      </div>
+      <Toast d="pm-toast" icon={<CalendarPlus size={16} />} title="New booking from Booking.com" line="Daniel Okafor · Thu 4 – Sun 7 Oct · deluxe king" />
+      <Toast d="pm-toast2" icon={<BedDouble size={16} />} title="Room 305 sent to housekeeping" line="It can't be checked in again until it's cleared" />
+    </div>
+  );
+}
+
+/* ---------- Kitchen display: tickets by wait time, bump to tell the waiter ---------- */
+
+type Ticket = { d: string; table: string; from: string; time: string; bar: string; items: string[]; bump?: boolean; hidden?: boolean };
+const TICKETS: Ticket[] = [
+  { d: "kd-t12", table: "T-12", from: "Waiter tablet", time: "16:20", bar: "bg-alert", items: ["2× Pan-seared sea bass", "1× Ribeye, medium rare", "1× Tagliolini al tartufo"], bump: true },
+  { d: "kd-t04", table: "T-04", from: "Till", time: "9:05", bar: "bg-brass", items: ["1× Chef's tasting menu", "1× Tasting, no shellfish", "2× House brioche"] },
+  { d: "kd-t07", table: "T-07", from: "QR order", time: "3:40", bar: "bg-sage", items: ["2× Burrata", "1× Wagyu carpaccio", "1× Chocolate soufflé"] },
+  { d: "kd-new", table: "T-06", from: "QR order", time: "0:00", bar: "bg-sage", items: ["2× Wagyu carpaccio", "1× Sea bass, no butter"], hidden: true },
+];
+
+export function KdsScreen() {
+  return (
+    <div className="flex h-full flex-col gap-5 p-7">
+      <Head
+        label="Kitchen display · Hot line"
+        title="Tickets"
+        right={
+          <>
+            <Chip className="px-3 py-1.5 text-[12px]">Average ticket 11 min</Chip>
+            <Chip tone="brass" d="kd-open" className="px-3 py-1.5 text-[12px]">3 open</Chip>
+          </>
+        }
+      />
+      <div className="grid min-h-0 flex-1 grid-cols-4 items-start gap-4">
+        {TICKETS.map((t) => (
+          <div key={t.d} data-d={t.d} className={`relative flex flex-col overflow-hidden rounded-lg border border-line bg-cream ${t.hidden ? HIDDEN : ""}`}>
+            <span data-d={`${t.d}-bar`} className={`block h-2 ${t.bar}`} />
+            <div className="flex items-start justify-between p-4 pb-2">
+              <div>
+                <p className="text-[22px] font-semibold leading-none">{t.table}</p>
+                <p className="mt-1.5 text-[12px] text-taupe">{t.from}</p>
+              </div>
+              <span className="flex items-center gap-1 text-[15px] font-semibold tabular-nums">
+                <Clock size={14} /> <span data-d={`${t.d}-time`}>{t.time}</span>
+              </span>
+            </div>
+            <ul className="flex-1 px-4">
+              {t.items.map((item) => (
+                <li key={item} className="flex items-center gap-2 border-t border-line-soft py-2.5 text-[14px] font-semibold">
+                  <span className="h-4 w-4 flex-none rounded border border-line" /> {item}
+                </li>
+              ))}
+            </ul>
+            {t.bump ? (
+              <span className="relative m-4 block">
+                <Btn tone="dark" d="kd-bump" className="h-12 w-full text-[14px]">Bump · all ready</Btn>
+                <span data-d="kd-ready" className={`absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-sage text-[14px] font-semibold text-white ${HIDDEN}`}>
+                  <Check size={16} strokeWidth={3} /> Ready · waiter told
+                </span>
+              </span>
+            ) : (
+              <span className="m-4 block"><Btn className="h-12 w-full text-[14px]">Bump</Btn></span>
+            )}
+          </div>
+        ))}
+      </div>
+      <p className="flex gap-5 text-[12px] text-taupe">
+        <span className="flex items-center gap-1.5"><span className="h-2 w-5 rounded-full bg-sage" /> Under 8 minutes</span>
+        <span className="flex items-center gap-1.5"><span className="h-2 w-5 rounded-full bg-brass" /> 8 to 15 minutes</span>
+        <span className="flex items-center gap-1.5"><span className="h-2 w-5 rounded-full bg-alert" /> Over 15 minutes</span>
+      </p>
+      <Toast d="kd-toast" icon={<BellRing size={16} />} title="Table 12 is ready" line="Sarah L. was told on her tablet" />
+    </div>
+  );
+}
+
+/* ---------- Placeholder for modules whose demo comes in the next build ---------- */
+
+export function SoonScreen({ name, line }: { name: string; line: string }) {
+  return (
+    <div className="flex h-full flex-col gap-5 p-7">
+      <Head label="SPEAR OS" title={name} />
+      <Card className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
+        <Clock size={30} className="text-brass-deep" />
+        <p className="text-[22px] font-semibold">{line}</p>
+        <p className="text-taupe">This module&apos;s demo arrives in the next preview build.</p>
+      </Card>
+    </div>
+  );
+}
+

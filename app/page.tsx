@@ -6,7 +6,8 @@ import Journey from "@/components/home/Journey";
 import Reliability from "@/components/home/Reliability";
 import DemoForm from "@/components/home/DemoForm";
 import Motion from "@/components/home/Motion";
-import { FAQS, Faq, Footer, Modules, Owned, Packages } from "@/components/home/Content";
+import { FAQS, Faq, Footer, Owned, Packages } from "@/components/home/Content";
+import Explorer from "@/components/home/Explorer";
 
 const software = {
   "@context": "https://schema.org",
@@ -39,7 +40,7 @@ export default function HomePage() {
         <Showcase />
         <Journey />
         <Reliability />
-        <Modules />
+        <Explorer />
         <Packages />
         <Owned />
         <Faq />

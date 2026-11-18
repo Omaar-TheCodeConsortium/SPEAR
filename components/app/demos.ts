@@ -65,6 +65,31 @@ function kit({ tl, canvas, cursor }: DemoKit) {
         at,
       );
     },
+    // Press on an element, carry it onto another one, and let go.
+    drag(name: string, to: string, duration = 1) {
+      const delta = { x: 0, y: 0 };
+      tl.to(cursor, { scale: 0.86, duration: 0.12 });
+      tl.to(
+        el(canvas, name),
+        {
+          x: () => {
+            const a = point(canvas, el(canvas, name), 0, 0);
+            const b = point(canvas, el(canvas, to), 0, 0);
+            delta.x = b.x - a.x;
+            delta.y = b.y - a.y;
+            return `+=${delta.x}`;
+          },
+          y: () => `+=${delta.y}`,
+          boxShadow: "0 14px 28px -8px rgba(34,27,22,0.35)",
+          duration,
+          ease: "power2.inOut",
+        },
+        "+=0.1",
+      );
+      tl.to(cursor, { x: () => `+=${delta.x}`, y: () => `+=${delta.y}`, duration, ease: "power2.inOut" }, "<");
+      tl.to(el(canvas, name), { boxShadow: "0 0 0 0 rgba(34,27,22,0)", duration: 0.25 });
+      tl.to(cursor, { scale: 1, duration: 0.15 }, "<");
+    },
     toast(name: string, at?: gsap.Position) {
       tl.fromTo(el(canvas, name), { autoAlpha: 0, y: -14 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: "back.out(1.6)" }, at);
     },
@@ -198,6 +223,102 @@ export function housekeepingDemo(k: DemoKit) {
   tl.call(step, [3]);
 }
 
+export function pmsDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  tl.call(step, [0]);
+  a.toast("pm-toast", "+=0.2");
+  a.show("pm-new", "<0.25", { y: -12 });
+  a.flash("pm-new", "<0.3");
+  a.enter(720, 660, "+=0.5");
+  tl.addLabel("drag");
+  a.move("pm-new", 0.4, 0.5);
+  a.hide("pm-toast", "<");
+  a.show("pm-slot", "<0.5", { scale: 0.96 });
+  a.drag("pm-new", "pm-slot");
+  a.hide("pm-slot", "<");
+  tl.to(a.q("pm-new"), { backgroundColor: "rgba(78,115,86,0.2)", borderColor: "rgba(78,115,86,0.5)", borderStyle: "solid", duration: 0.4 }, "<");
+  a.hide("pm-st-clean", "<");
+  a.show("pm-st-occ", "<", { y: 4 });
+  a.swap("pm-assign", "All assigned", "<");
+  a.hide("pm-empty", "<");
+  a.show("pm-guest", "<0.1", { x: 24 });
+  tl.addLabel("guest");
+  tl.call(step, [1], "+=1.4");
+  tl.addLabel("charge");
+  a.show("pm-charge", undefined, { x: -14 });
+  a.flash("pm-charge", "<");
+  a.swap("pm-total", "$993.40", "+=0.2");
+  a.flash("pm-total-box", "<");
+  tl.call(step, [2], "+=0.9");
+  tl.addLabel("checkout");
+  a.swap("pm-when", "Checking out today");
+  a.move("pm-checkout", 0.5, 0.5, 1);
+  a.click();
+  a.show("pm-settled", "<0.1", { scale: 0.96 });
+  a.hide("pm-st-occ", "+=0.3");
+  a.show("pm-st-dirty", "<", { y: 4 });
+  a.toast("pm-toast2", "<");
+  a.leave(-160, 60);
+  tl.call(step, [3]);
+}
+
+export function kdsDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  tl.call(step, [0]);
+  a.show("kd-new", "+=0.3", { x: 40 });
+  a.flash("kd-new", "<0.3");
+  a.swap("kd-open", "4 open", "<");
+  tl.call(step, [1], "+=1");
+  tl.addLabel("wait");
+  a.swap("kd-t07-time", "8:02");
+  tl.to(a.q("kd-t07-bar"), { backgroundColor: "#c79a45", duration: 0.6 }, "<");
+  a.flash("kd-t07", "<");
+  a.swap("kd-t04-time", "15:10", "+=0.4");
+  tl.to(a.q("kd-t04-bar"), { backgroundColor: "#ba1a1a", duration: 0.6 }, "<");
+  a.flash("kd-t04", "<");
+  tl.call(step, [2], "+=0.8");
+  tl.addLabel("bump");
+  a.enter(560, 660);
+  a.move("kd-bump");
+  a.click();
+  a.show("kd-ready", "<0.1", { scale: 0.96 });
+  tl.to(a.q("kd-t12"), { opacity: 0.55, duration: 0.4 }, "+=0.3");
+  a.toast("kd-toast", "<");
+  a.swap("kd-open", "3 open", "<");
+  a.leave(140, -40);
+  tl.call(step, [3]);
+}
+
+export function posOfflineDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  tl.call(step, [0]);
+  a.show("rs-offline", "+=0.3", { y: -12 });
+  a.flash("rs-offline", "<0.3");
+  a.enter(560, 660, "+=0.4");
+  tl.addLabel("table");
+  a.move("rs-t8");
+  a.click();
+  a.hide("rs-empty", "<");
+  a.show("rs-ticket", "<0.1", { x: 20 });
+  tl.call(step, [1], "+=0.6");
+  tl.addLabel("charge");
+  a.move("rs-charge", 0.5, 0.5, 0.9);
+  a.click();
+  a.show("rs-posted", "<0.1", { scale: 0.96 });
+  a.swap("rs-t8-state", "Paid · on room", "<");
+  a.swap("rs-offline-text", "Internet down · 4 sales saved on this till", "+=0.3");
+  a.leave(120, -60);
+  tl.call(step, [2], "+=0.6");
+  tl.addLabel("online");
+  a.hide("rs-offline");
+  a.show("rs-online", "<0.1", { y: -8 });
+  a.flash("rs-online", "<0.2");
+  tl.call(step, [3], "+=0.4");
+}
+
 // The hero: a new restaurant bill arrives on a room's folio a moment after the page settles.
 export function heroLoop(canvas: HTMLElement) {
   const row = el(canvas, "ov-new");
@@ -298,6 +419,29 @@ export const FILMS: Record<string, Film> = {
       ["clean", { x: 600, y: 220, w: 440 }],
     ],
   },
+};
+
+FILMS.pms = {
+  start: { d: "pm-cal", w: 560, ax: 0.42, ay: 0.4 },
+  cues: [
+    ["guest+=0.2", { d: "pm-guest", w: 430, ay: 0.32 }],
+    ["checkout", { d: "pm-guest", w: 430, ay: 0.72 }],
+    ["checkout+=2.6", { d: "pm-cal", w: 560, ax: 0.42, ay: 0.4 }],
+  ],
+};
+FILMS.kds = {
+  start: { d: "kd-new", w: 480, ax: 0.1, ay: 0.45 },
+  cues: [
+    ["wait-=0.6", { d: "kd-t04", w: 480, ax: 1, ay: 0.45 }],
+    ["bump-=0.6", { d: "kd-t12", w: 460, ax: 0.6, ay: 0.5 }],
+  ],
+};
+FILMS.pos = {
+  start: { d: "rs-offline", w: 460, ax: 0.5, ay: 0.85 },
+  cues: [
+    ["table+=0.9", { x: 765, y: 200, w: 430 }],
+    ["online-=0.3", { d: "rs-online", w: 480, ax: 0.6, ay: 0.85 }],
+  ],
 };
 
 // The hero on phones: a slow tour of the overview, card by card, with a new bill arriving on a folio.

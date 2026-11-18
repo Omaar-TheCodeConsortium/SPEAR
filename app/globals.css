@@ -76,6 +76,8 @@ body {
 .step.is-active .dot { background: var(--color-brass); border-color: var(--color-brass); box-shadow: 0 0 0 5px rgb(199 154 69 / 0.2); }
 .step.is-done { color: var(--color-espresso); }
 .step.is-done .dot { background: var(--color-sage); border-color: var(--color-sage); }
+.step.is-static { color: var(--color-espresso); }
+.step.is-static .dot { background: var(--color-brass); border-color: var(--color-brass); }
 
 /* Rail inside the app picture */
 .rail-item { color: rgb(92 79 68 / 0.8); transition: color 0.4s; }
