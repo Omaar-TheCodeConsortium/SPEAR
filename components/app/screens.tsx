@@ -123,7 +123,7 @@ export function OverviewScreen() {
         }
       />
       <div className="grid grid-cols-3 gap-5">
-        <Card className="p-5">
+        <Card d="ov-occ" className="p-5">
           <div className="flex items-center justify-between">
             <Label>Room occupancy</Label>
             <Chip tone="brass">Tonight</Chip>
@@ -132,7 +132,7 @@ export function OverviewScreen() {
           <p className="mb-3 mt-2 text-[13px] text-taupe">43 of 50 rooms · 12 departing tomorrow</p>
           <Bar value={86} />
         </Card>
-        <Card className="p-5">
+        <Card d="ov-rest" className="p-5">
           <div className="flex items-center justify-between">
             <Label>Restaurant</Label>
             <Chip tone="sage">Dinner service</Chip>
@@ -147,7 +147,7 @@ export function OverviewScreen() {
             ))}
           </span>
         </Card>
-        <Card className="p-5">
+        <Card d="ov-kitchen" className="p-5">
           <div className="flex items-center justify-between">
             <Label>Kitchen</Label>
             <Chip tone="alert">Needs attention</Chip>
@@ -159,7 +159,7 @@ export function OverviewScreen() {
         </Card>
       </div>
       <div className="grid min-h-0 flex-1 grid-cols-[1.3fr_1fr] gap-5">
-        <Card className="p-5">
+        <Card d="ov-arrivals" className="p-5">
           <div className="mb-2 flex items-center justify-between">
             <h4 className="text-[17px] font-semibold">Arrivals tonight</h4>
             <Chip>8 expected</Chip>
@@ -179,7 +179,7 @@ export function OverviewScreen() {
             </div>
           ))}
         </Card>
-        <Card className="overflow-hidden p-5">
+        <Card d="ov-bills" className="overflow-hidden p-5">
           <div className="mb-2 flex items-center justify-between">
             <h4 className="text-[17px] font-semibold">Restaurant bills sent to rooms</h4>
             <Receipt size={18} className="text-brass-deep" />

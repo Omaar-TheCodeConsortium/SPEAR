@@ -1,5 +1,6 @@
 import { gsap } from "@/lib/gsap";
 import { DAY_W } from "./screens";
+import { CAMERA_RATIO, CANVAS_H, CANVAS_W, WIDE, type Shot } from "./Stage";
 
 // Scripted demos for each area. A demo adds tweens to a paused timeline; the caller plays it,
 // and reverting the surrounding gsap.context puts the screen back as it was.
@@ -77,12 +78,14 @@ export function frontDeskDemo(k: DemoKit) {
   tl.call(step, [0]);
   a.move("fd-checkin");
   a.click();
+  tl.addLabel("panel");
   a.flash("fd-row");
   a.show("fd-panel", "<", { x: 24 });
   a.show("fd-id", "+=0.5", { scale: 0.4 });
   tl.call(step, [1], "+=0.4");
   tl.from(canvas.querySelectorAll("[data-qr]"), { opacity: 0, duration: 0.25, stagger: { each: 0.003, from: "random" } });
   tl.call(step, [2], "+=0.5");
+  tl.addLabel("done");
   a.show("fd-phone");
   a.hide("fd-checkin", "<");
   a.show("fd-done", "<", { scale: 0.8 });
@@ -103,6 +106,7 @@ export function roomsDemo(k: DemoKit) {
   tl.to(a.q("rm-bar"), { width: `+=${DAY_W}`, duration: 0.8, ease: "power2.inOut" }, "<");
   tl.to(cursor, { scale: 1, duration: 0.15 });
   tl.call(step, [1]);
+  tl.addLabel("folio");
   a.swap("rm-dates", "Thu 4 – Mon 8 Oct · 4 nights");
   a.flash("rm-dates-box", "<");
   a.swap("rm-nights", "Room, 4 nights × $474", "+=0.2");
@@ -110,6 +114,7 @@ export function roomsDemo(k: DemoKit) {
   a.swap("rm-total", "$2,540.00", "+=0.15");
   a.flash("rm-total-box", "<");
   tl.call(step, [2], "+=0.4");
+  tl.addLabel("key");
   a.swap("rm-key-text", "Works until Mon 8 Oct, 11:00");
   a.flash("rm-key", "<");
   a.toast("rm-toast", "<0.2");
@@ -125,6 +130,7 @@ export function restaurantDemo(k: DemoKit) {
   a.move("rs-t8");
   a.click();
   tl.to(a.q("rs-t8"), { boxShadow: "0 0 0 2px #7c5801, 0 10px 24px -6px rgba(34,27,22,0.25)", duration: 0.25 }, "<");
+  tl.addLabel("ticket");
   a.hide("rs-empty", "<");
   a.show("rs-ticket", "<0.1", { x: 20 });
   tl.call(step, [1], "+=0.5");
@@ -144,9 +150,11 @@ export function kitchenDemo(k: DemoKit) {
   const a = kit(k);
   tl.call(step, [0]);
   a.toast("kt-toast", "+=0.2");
+  tl.addLabel("deplete", "+=0.5");
   tl.to(a.q("kt-bar"), { width: "0%", duration: 1.1, ease: "power2.inOut" }, "+=0.5");
   a.swap("kt-qty", "0.0 kg", "<0.55");
   tl.call(step, [1], "+=0.2");
+  tl.addLabel("off");
   tl.to(a.q("kt-dish"), { opacity: 0.45, textDecoration: "line-through", duration: 0.3 });
   a.show("kt-86", "<");
   a.swap("kt-off", "1", "<");
@@ -154,6 +162,7 @@ export function kitchenDemo(k: DemoKit) {
   a.enter(1000, 660, "+=0.2");
   a.move("kt-order");
   tl.call(step, [2]);
+  tl.addLabel("sent");
   a.click();
   a.hide("kt-order", "<0.1");
   a.show("kt-sent", "<", { scale: 0.85 });
@@ -167,18 +176,21 @@ export function housekeepingDemo(k: DemoKit) {
   const a = kit(k);
   tl.call(step, [0]);
   a.toast("hk-toast", "+=0.2");
+  tl.addLabel("tile", "+=0.5");
   a.hide("hk-s0", "+=0.5");
   a.show("hk-s1", "<", { y: 6 });
   a.flash("hk-tile", "<");
   a.show("hk-job", "+=0.4", { y: -16 });
   a.hide("hk-toast", "<0.6");
   tl.call(step, [1]);
+  tl.addLabel("job");
   a.enter(700, 620, "+=0.1");
   a.move("hk-done", 0.5, 0.5, 1);
   a.click();
   a.show("hk-checks", "<0.1", { y: -4 });
   a.show("hk-donechip", "<", { scale: 0.9 });
   tl.call(step, [2], "+=0.3");
+  tl.addLabel("clean");
   a.hide("hk-s1");
   a.show("hk-s2", "<", { y: 6 });
   a.flash("hk-tile", "<");
@@ -193,4 +205,116 @@ export function heroLoop(canvas: HTMLElement) {
     .timeline({ delay: 1.6 })
     .from(row, { height: 0, paddingTop: 0, paddingBottom: 0, opacity: 0, duration: 0.6, ease: "power3.out" })
     .fromTo(row, { backgroundColor: "rgba(199,154,69,0.22)" }, { backgroundColor: "rgba(199,154,69,0)", duration: 1.6 });
+}
+
+/* ---------- The camera, for phones ---------- */
+
+// A cue points the camera at a fixed shot, or at a named element (w sets how close, ax/ay where it sits).
+export type Cue = Shot | { d: string; w?: number; ax?: number; ay?: number };
+// Where the camera starts, and the shots it cuts to at labels in the demo.
+export type Film = { start: Cue; cues: [string, Cue][] };
+
+const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
+
+function resolve(canvas: HTMLElement, cue: Cue): Shot {
+  let shot: Shot;
+  if ("d" in cue) {
+    // Measured through the layout rather than the screen, so tilts and camera moves don't skew it.
+    const target = el(canvas, cue.d);
+    const r = { x: 0, y: 0, w: target.offsetWidth, h: target.offsetHeight };
+    for (let node: HTMLElement | null = target; node && node !== canvas; node = node.offsetParent as HTMLElement | null) {
+      r.x += node.offsetLeft;
+      r.y += node.offsetTop;
+    }
+    const w = Math.max(cue.w ?? 420, Math.min(r.w + 48, 640));
+    shot = { x: r.x + r.w * (cue.ax ?? 0.5) - w / 2, y: r.y + r.h * (cue.ay ?? 0.5) - (w * CAMERA_RATIO) / 2, w };
+  } else shot = { ...cue };
+  // Keep the frame on the window.
+  const w = Math.min(shot.w, CANVAS_W);
+  const h = w * CAMERA_RATIO;
+  return { x: clamp(shot.x, 0, CANVAS_W - w), y: h >= CANVAS_H ? (CANVAS_H - h) / 2 : clamp(shot.y, 0, CANVAS_H - h), w };
+}
+
+const vars = (s: Shot) => ({ "--cx": s.x, "--cy": s.y, "--cw": s.w });
+const glide = (s: Shot, duration = 1.1) => ({ ...vars(s), duration, ease: "power3.inOut" });
+
+export const filming = (canvas: HTMLElement) => canvas.hasAttribute("data-camera");
+export const resetCamera = (canvas: HTMLElement) => gsap.set(canvas, vars(WIDE));
+export const frameOn = (canvas: HTMLElement, cue: Cue) => gsap.set(canvas, vars(resolve(canvas, cue)));
+
+// Builds a demo ready to play. On a filmed stage the camera starts on the whole window, pushes in
+// to the first shot, follows the cues, then pulls back out so you see where it all happened.
+export function buildDemo(
+  demo: (kit: DemoKit) => void,
+  film: Film | undefined,
+  { canvas, cursor, step, reduce }: { canvas: HTMLElement; cursor: HTMLElement; step: (i: number) => void; reduce: boolean },
+) {
+  const tl = gsap.timeline({ paused: true });
+  const body = gsap.timeline();
+  demo({ tl: body, canvas, cursor, step });
+  let lead = 0.35;
+  if (film && filming(canvas)) {
+    tl.set(canvas, vars(WIDE)).to(canvas, glide(resolve(canvas, film.start), 1.3), 0.7);
+    lead = 1.9;
+    film.cues.forEach(([at, cue]) => body.to(canvas, glide(resolve(canvas, cue)), at));
+    if (!reduce) body.to(canvas, glide(WIDE, 1.5), "+=1.8");
+  }
+  tl.add(body, lead);
+  return tl;
+}
+
+export const FILMS: Record<string, Film> = {
+  desk: {
+    start: { x: 100, y: 40, w: 570 },
+    cues: [
+      ["panel", { x: 690, y: 150, w: 500 }],
+      ["done+=1.2", { x: 530, y: 60, w: 520 }],
+    ],
+  },
+  rooms: {
+    start: { x: 250, y: 60, w: 460 },
+    cues: [
+      ["folio-=0.3", { x: 790, y: 200, w: 410 }],
+      ["key", { x: 790, y: 60, w: 410 }],
+    ],
+  },
+  restaurant: {
+    start: { x: 440, y: 180, w: 420 },
+    cues: [["ticket", { x: 765, y: 200, w: 430 }]],
+  },
+  kitchen: {
+    start: { x: 780, y: 40, w: 420 },
+    cues: [
+      ["deplete-=1", { x: 90, y: 150, w: 480 }],
+      ["off", { x: 700, y: 150, w: 460 }],
+      ["sent+=0.4", { x: 780, y: 40, w: 420 }],
+    ],
+  },
+  housekeeping: {
+    start: { x: 760, y: 40, w: 420 },
+    cues: [
+      ["tile-=0.8", { x: 600, y: 220, w: 440 }],
+      ["job", { x: 780, y: 200, w: 420 }],
+      ["clean", { x: 600, y: 220, w: 440 }],
+    ],
+  },
+};
+
+// The hero on phones: a slow tour of the overview, card by card, with a new bill arriving on a folio.
+export function heroTour(canvas: HTMLElement) {
+  const row = el(canvas, "ov-new");
+  const shot = (d: string, w = 420, ax = 0.5) => vars(resolve(canvas, { d, w, ax }));
+  const tl = gsap.timeline({ repeat: -1, defaults: { duration: 1.4, ease: "power3.inOut" } });
+  tl.set(canvas, vars(WIDE))
+    .set(row, { height: 0, paddingTop: 0, paddingBottom: 0, opacity: 0 })
+    .to(canvas, shot("ov-occ"), "+=1.4")
+    .to(canvas, shot("ov-rest"), "+=1.8")
+    .to(canvas, shot("ov-kitchen"), "+=1.8")
+    .to(canvas, shot("ov-bills", 460), "+=1.8")
+    .to(row, { height: "auto", paddingTop: 10, paddingBottom: 10, opacity: 1, duration: 0.6, ease: "power3.out" }, "+=0.3")
+    .fromTo(row, { backgroundColor: "rgba(199,154,69,0.3)" }, { backgroundColor: "rgba(199,154,69,0)", duration: 1.6, ease: "none" })
+    .to(canvas, shot("ov-arrivals", 460, 0.38), "+=0.4")
+    .to(canvas, { ...vars(WIDE), duration: 1.6 }, "+=2");
+  tl.to({}, { duration: 1.6 });
+  return tl;
 }

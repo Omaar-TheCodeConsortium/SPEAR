@@ -1,12 +1,12 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { asset } from "@/lib/constants";
 import Stage from "@/components/app/Stage";
 import AppShell from "@/components/app/AppShell";
 import { OverviewScreen } from "@/components/app/screens";
-import { heroLoop } from "@/components/app/demos";
+import { filming, frameOn, heroLoop, heroTour } from "@/components/app/demos";
 import { BUTTON_DARK, BUTTON_LIGHT, SpearMeaning } from "./ui";
 
 const HERO_LABEL =
@@ -31,7 +31,21 @@ export default function Hero() {
           scrollTrigger: { trigger: frame, start: "top 90%", end: "top 25%", scrub: 0.6 },
         });
 
-        root.current!.querySelectorAll<HTMLElement>("[data-canvas]").forEach((canvas) => heroLoop(canvas));
+        root.current!.querySelectorAll<HTMLElement>("[data-canvas]").forEach((canvas) => {
+          if (!filming(canvas)) return heroLoop(canvas);
+          // On phones the camera tours the overview, and rests while the hero is off screen.
+          const tour = heroTour(canvas).pause();
+          ScrollTrigger.create({
+            trigger: canvas.parentElement,
+            start: "top bottom",
+            end: "bottom top",
+            onToggle: (self) => (self.isActive ? tour.play() : tour.pause()),
+          });
+        });
+      });
+      // Without motion, the phone camera rests on one readable card.
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        root.current!.querySelectorAll<HTMLElement>("[data-canvas][data-camera]").forEach((canvas) => frameOn(canvas, { d: "ov-bills", w: 460 }));
       });
     },
     { scope: root },
@@ -77,8 +91,8 @@ export default function Hero() {
               <OverviewScreen />
             </AppShell>
           </Stage>
-          {/* On phones the whole window would be too small to read, so show its left half */}
-          <Stage className="md:hidden" label={HERO_LABEL} focus={{ x: 0, y: 0, w: 640, h: 700 }}>
+          {/* On phones the whole window would be too small to read, so a camera tours it up close */}
+          <Stage className="md:hidden" label={HERO_LABEL} camera>
             <AppShell active="overview">
               <OverviewScreen />
             </AppShell>

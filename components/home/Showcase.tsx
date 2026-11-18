@@ -3,10 +3,10 @@
 import { useRef, type ComponentType } from "react";
 import { RotateCcw } from "lucide-react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import Stage, { Cursor, type Focus } from "@/components/app/Stage";
+import Stage, { Cursor } from "@/components/app/Stage";
 import AppShell, { RAIL, RAIL_STEP, type RailKey } from "@/components/app/AppShell";
 import { FrontDeskScreen, HousekeepingScreen, KitchenScreen, RestaurantScreen, RoomsScreen } from "@/components/app/screens";
-import { frontDeskDemo, housekeepingDemo, kitchenDemo, restaurantDemo, roomsDemo, type DemoKit } from "@/components/app/demos";
+import { buildDemo, FILMS, frontDeskDemo, housekeepingDemo, kitchenDemo, resetCamera, restaurantDemo, roomsDemo, type DemoKit } from "@/components/app/demos";
 import { SectionHead } from "./ui";
 
 type Area = {
@@ -16,7 +16,6 @@ type Area = {
   steps: [string, string, string];
   Screen: ComponentType;
   demo: (kit: DemoKit) => void;
-  focus: Focus; // the part of the window shown on phones
   label: string;
 };
 
@@ -28,7 +27,6 @@ const AREAS: Area[] = [
     steps: ["Check the guest's ID at the desk", "Show a single-use QR code to scan", "Their stay opens on their phone, no app"],
     Screen: FrontDeskScreen,
     demo: frontDeskDemo,
-    focus: { x: 560, y: 120, w: 620, h: 600 },
     label: "SPEAR front desk screen: a guest is checked in and given a QR code that opens their stay on their phone.",
   },
   {
@@ -38,7 +36,6 @@ const AREAS: Area[] = [
     steps: ["Drag a stay to add a night", "The guest's bill updates itself", "Their wallet room key is extended"],
     Screen: RoomsScreen,
     demo: roomsDemo,
-    focus: { x: 470, y: 130, w: 700, h: 610 },
     label: "SPEAR room calendar: a stay is extended by a night and the bill and room key update.",
   },
   {
@@ -48,7 +45,6 @@ const AREAS: Area[] = [
     steps: ["Open the table's bill from the floor plan", "SPEAR knows the table is a hotel guest", "Charge it to their room in one tap"],
     Screen: RestaurantScreen,
     demo: restaurantDemo,
-    focus: { x: 540, y: 120, w: 640, h: 620 },
     label: "SPEAR restaurant screen: table 8's bill is charged to the guest's hotel room.",
   },
   {
@@ -58,7 +54,6 @@ const AREAS: Area[] = [
     steps: ["Each sale deducts its recipe from stock", "Run out, and the dish leaves every menu", "Reorder from the supplier in one click"],
     Screen: KitchenScreen,
     demo: kitchenDemo,
-    focus: { x: 400, y: 70, w: 790, h: 560 },
     label: "SPEAR kitchen screen: a sale uses up the last Wagyu, the dish is taken off the menu and a supplier order is sent.",
   },
   {
@@ -68,7 +63,6 @@ const AREAS: Area[] = [
     steps: ["Checkout flags the room for cleaning", "Housekeeping gets the job on their phone", "Marked clean, the room is ready to sell"],
     Screen: HousekeepingScreen,
     demo: housekeepingDemo,
-    focus: { x: 640, y: 120, w: 540, h: 620 },
     label: "SPEAR housekeeping screen: a checked-out room goes to a housekeeper's phone and comes back ready.",
   },
 ];
@@ -120,8 +114,7 @@ export default function Showcase() {
       const run = (area: Area, canvas: HTMLElement, cursor: HTMLElement, step: (i: number) => void, reduce: boolean) => {
         step(-1);
         const ctx = gsap.context(() => {
-          const tl = gsap.timeline({ paused: true, delay: 0.35 });
-          area.demo({ tl, canvas, cursor, step });
+          const tl = buildDemo(area.demo, FILMS[area.rail], { canvas, cursor, step, reduce });
           if (reduce) {
             tl.progress(1);
             gsap.set(cursor, { autoAlpha: 0 });
@@ -129,6 +122,7 @@ export default function Showcase() {
         }, canvas);
         return () => {
           ctx.revert();
+          resetCamera(canvas);
           step(-1);
         };
       };
@@ -285,7 +279,7 @@ export default function Showcase() {
             <h3 className="mt-1 text-[26px] font-semibold tracking-[-0.01em]">{area.title}</h3>
             <p className="mt-2 text-[17px] leading-relaxed text-taupe">{area.line}</p>
             <div className={`mt-6 ${WINDOW}`}>
-              <Stage label={area.label} focus={area.focus}>
+              <Stage label={area.label} camera>
                 <AppShell active={area.rail}>
                   <area.Screen />
                 </AppShell>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
 
 // Every app screen is drawn at one fixed size and scaled to fit, so it looks the same at any width.
 export const CANVAS_W = 1200;
@@ -9,16 +9,36 @@ export const CANVAS_H = 760;
 export type Focus = { x: number; y: number; w: number; h: number };
 const FULL: Focus = { x: 0, y: 0, w: CANVAS_W, h: CANVAS_H };
 
-// focus crops the picture to one region, used on phones where the whole window would be too small to read.
+// A camera shot: the top-left corner and width of the region in view, in canvas pixels.
+// On phones the stage is a portrait frame, so a shot is always CAMERA_RATIO times taller than it is wide.
+export type Shot = { x: number; y: number; w: number };
+export const CAMERA_RATIO = 1.25;
+// The whole window, small, with a margin round it, so it reads as a desktop screen.
+export const WIDE: Shot = { x: -70, y: (CANVAS_H - (CANVAS_W + 140) * CAMERA_RATIO) / 2, w: CANVAS_W + 140 };
+
+// The camera position lives in CSS variables, so GSAP can move it and reverting a demo puts it back.
+const CAMERA_STYLE = {
+  "--bw": 358,
+  "--cx": WIDE.x,
+  "--cy": WIDE.y,
+  "--cw": WIDE.w,
+  transform:
+    "translate(calc(var(--cx) * var(--bw) / var(--cw) * -1px), calc(var(--cy) * var(--bw) / var(--cw) * -1px)) scale(calc(var(--bw) / var(--cw)))",
+} as CSSProperties;
+
+// focus crops the picture to one fixed region. camera instead films the window up close on phones,
+// with a camera that the demos move from shot to shot.
 export default function Stage({
   children,
   label,
   focus = FULL,
+  camera = false,
   className = "",
 }: {
   children: ReactNode;
   label: string;
   focus?: Focus;
+  camera?: boolean;
   className?: string;
 }) {
   const outer = useRef<HTMLDivElement>(null);
@@ -30,15 +50,18 @@ export default function Stage({
     const canvas = inner.current;
     if (!box || !canvas) return;
     const fit = () => {
-      const scale = box.clientWidth / w;
-      canvas.style.transform = `translate(${-x * scale}px, ${-y * scale}px) scale(${scale})`;
+      if (camera) canvas.style.setProperty("--bw", String(box.clientWidth));
+      else {
+        const scale = box.clientWidth / w;
+        canvas.style.transform = `translate(${-x * scale}px, ${-y * scale}px) scale(${scale})`;
+      }
       box.dataset.ready = "";
     };
     fit();
     const observer = new ResizeObserver(fit);
     observer.observe(box);
     return () => observer.disconnect();
-  }, [x, y, w]);
+  }, [x, y, w, camera]);
 
   return (
     <div
@@ -46,15 +69,16 @@ export default function Stage({
       data-stage=""
       role="img"
       aria-label={label}
-      className={`relative overflow-hidden ${className}`}
-      style={{ aspectRatio: `${w} / ${h}` }}
+      className={`relative overflow-hidden ${camera ? "bg-parchment" : ""} ${className}`}
+      style={{ aspectRatio: camera ? `1 / ${CAMERA_RATIO}` : `${w} / ${h}` }}
     >
       <div
         ref={inner}
         data-canvas=""
+        data-camera={camera ? "" : undefined}
         aria-hidden="true"
-        className="absolute left-0 top-0 origin-top-left"
-        style={{ width: CANVAS_W, height: CANVAS_H }}
+        className={`absolute left-0 top-0 origin-top-left ${camera ? "overflow-hidden rounded-[20px] shadow-[0_30px_70px_-10px_rgba(34,27,22,0.45)] ring-1 ring-line" : ""}`}
+        style={{ width: CANVAS_W, height: CANVAS_H, ...(camera ? CAMERA_STYLE : {}) }}
       >
         {children}
       </div>
