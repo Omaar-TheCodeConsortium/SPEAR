@@ -268,7 +268,9 @@ export default function Explorer() {
       if (placed.current) gsap.to(marker, { ...to, duration: 0.55, ease: "power3.inOut" });
       else gsap.set(marker, to);
       placed.current = true;
-      gsap.fromTo(nav.querySelectorAll("[data-linked] [data-ldot]"), { scale: 0 }, { scale: 1, duration: 0.45, stagger: 0.06, ease: "back.out(2.2)" });
+      // Clear the dots from the last module, then pop in the ones for this one.
+      gsap.to(nav.querySelectorAll("[data-mid]:not([data-linked]) [data-ldot]"), { scale: 0, duration: 0.25, overwrite: true });
+      gsap.fromTo(nav.querySelectorAll("[data-linked] [data-ldot]"), { scale: 0 }, { scale: 1, duration: 0.45, stagger: 0.06, ease: "back.out(2.2)", overwrite: true });
     },
     { scope: root, dependencies: [sel, desktop] },
   );
@@ -295,6 +297,10 @@ export default function Explorer() {
 
       {/* Desktop: the list on the left, the chosen module's window held in view on the right */}
       <div className="mx-auto hidden max-w-[1440px] grid-cols-[minmax(0,4fr)_minmax(0,8fr)] gap-12 px-10 lg:grid xl:gap-16">
+        <div>
+        <p className="mb-5 flex items-center gap-2 pl-5 text-[13px] text-taupe">
+          <span aria-hidden="true" className="h-2 w-2 rounded-full bg-brass" /> Works with {mod.name}
+        </p>
         <div data-mnav="" role="tablist" aria-orientation="vertical" aria-label="SPEAR modules" onKeyDown={onKey} className="relative pl-5">
           <span aria-hidden="true" className="absolute bottom-0 left-0 top-0 w-px bg-line" />
           <span aria-hidden="true" data-marker="" className="absolute left-0 top-0 w-[3px] -translate-x-px rounded-full bg-brass-deep" />
@@ -326,6 +332,7 @@ export default function Explorer() {
               })}
             </div>
           ))}
+        </div>
         </div>
 
         <div>
