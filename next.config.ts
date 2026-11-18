@@ -11,8 +11,8 @@ const nextConfig: NextConfig = {
    * Custom subdomain hosting (spear.thecodeconsortium.com) serves from root,
    * so basePath and assetPrefix are not needed.
    */
-  basePath: "",
-  assetPrefix: "",
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || "",
+  assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || "",
 
   /*
    * Trailing slash — GitHub Pages resolves routes correctly as /about/index.html
@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
   experimental: {},
 
   env: {
-    NEXT_PUBLIC_BASE_PATH: "",
+    NEXT_PUBLIC_BASE_PATH: process.env.NEXT_PUBLIC_BASE_PATH || "",
   },
 };
 
