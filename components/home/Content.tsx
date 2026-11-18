@@ -1,6 +1,6 @@
 import { Check, Plus } from "lucide-react";
 import { COMPANY, asset } from "@/lib/constants";
-import { BUTTON_DARK, BUTTON_LIGHT, EYEBROW, H2, SectionHead } from "./ui";
+import { BUTTON_DARK, BUTTON_LIGHT, EYEBROW, H2, SectionHead, SpearMeaning } from "./ui";
 
 /* ---------- Everything SPEAR covers ---------- */
 
@@ -230,11 +230,14 @@ export function Footer() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={asset("/brand/wordmark.webp")} alt="SPEAR" width={1280} height={143} className="h-auto w-56" loading="lazy" />
           <p className="mt-4 max-w-sm text-[15px] text-taupe">
-            Hotel and restaurant software in one system. A product of{" "}
-            <a href={COMPANY.url} className="font-semibold text-espresso underline decoration-brass underline-offset-4">
-              {COMPANY.name}
-            </a>
-            .
+            <SpearMeaning className="block text-[12px] tracking-[0.12em]" />
+            <span className="mt-2 block">
+              A product of{" "}
+              <a href={COMPANY.url} className="font-semibold text-espresso underline decoration-brass underline-offset-4">
+                {COMPANY.name}
+              </a>
+              .
+            </span>
           </p>
         </div>
         <div className="flex flex-col gap-4 text-[14px] text-taupe md:items-end">

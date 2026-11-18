@@ -11,6 +11,29 @@ export const EYEBROW = "text-[12px] font-semibold uppercase tracking-[0.14em] te
 export const H2 = "text-[clamp(2rem,4.2vw,3.25rem)] font-semibold leading-[1.08] tracking-[-0.025em]";
 export const LEAD = "text-[17px] leading-relaxed text-taupe md:text-[19px]";
 
+// What SPEAR stands for, with the letters that spell the name picked out in brass.
+export const SPEAR_MEANING = "Smart Platform for Every Accommodation & Restaurant";
+
+export function SpearMeaning({ className = "" }: { className?: string }) {
+  return (
+    <span className={`font-semibold uppercase text-taupe ${className}`}>
+      {SPEAR_MEANING.split(" ").map((word, i) => (
+        <span key={i}>
+          {i > 0 ? " " : ""}
+          {word === "for" || word === "&" ? (
+            word
+          ) : (
+            <>
+              <span className="font-bold text-brass-deep">{word[0]}</span>
+              {word.slice(1)}
+            </>
+          )}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export function SectionHead({
   id,
   eyebrow,

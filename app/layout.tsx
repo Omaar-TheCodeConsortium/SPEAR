@@ -12,7 +12,7 @@ const manrope = Manrope({
 
 const TITLE = "SPEAR OS | Hotel and restaurant software in one system";
 const DESCRIPTION =
-  "SPEAR OS runs the front desk, restaurant, kitchen and housekeeping as one product, and keeps working when the internet doesn't. Built and owned by The Code Consortium.";
+  "SPEAR OS, the Smart Platform for Every Accommodation & Restaurant, runs the front desk, restaurant, kitchen and housekeeping as one product, and keeps working when the internet doesn't.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

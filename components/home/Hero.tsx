@@ -7,7 +7,7 @@ import Stage from "@/components/app/Stage";
 import AppShell from "@/components/app/AppShell";
 import { OverviewScreen } from "@/components/app/screens";
 import { heroLoop } from "@/components/app/demos";
-import { BUTTON_DARK, BUTTON_LIGHT, EYEBROW } from "./ui";
+import { BUTTON_DARK, BUTTON_LIGHT, SpearMeaning } from "./ui";
 
 const HERO_LABEL =
   "The SPEAR overview screen: occupancy, restaurant tables, kitchen alerts, tonight's arrivals and restaurant bills sent to rooms.";
@@ -51,8 +51,8 @@ export default function Hero() {
           className="mx-auto h-auto w-[min(82vw,560px)]"
           fetchPriority="high"
         />
-        <p data-intro="" className={`mt-8 ${EYEBROW}`}>
-          Hotel and restaurant operating system
+        <p data-intro="" className="mt-6">
+          <SpearMeaning className="text-[12px] tracking-[0.14em] md:text-[13px]" />
         </p>
         <h1 id="hero-title" data-intro="" className="mx-auto mt-4 max-w-4xl text-[clamp(2.4rem,6vw,4.6rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
           Every room, table and guest in one system.
