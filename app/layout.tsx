@@ -1,137 +1,56 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
-import { SITE_URL } from "@/lib/constants";
+import { Manrope } from "next/font/google";
+import { COMPANY, IS_PREVIEW, SITE_URL } from "@/lib/constants";
 import "./globals.css";
 
-/* ============================================================
-   FONTS — loaded via next/font/google from Stitch Redesign
-   Playfair Display for headings & editorial titles
-   Plus Jakarta Sans for UI, body, labels, and metadata
-   ============================================================ */
-const playfair = Playfair_Display({
+const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-playfair",
+  variable: "--font-manrope",
   display: "swap",
-  weight: ["400", "500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-plus-jakarta",
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700", "800"],
-});
+const TITLE = "SPEAR OS | Hotel and restaurant software in one system";
+const DESCRIPTION =
+  "SPEAR OS runs the front desk, restaurant, kitchen and housekeeping as one product, and keeps working when the internet doesn't. Built and owned by The Code Consortium.";
 
-/* ============================================================
-   GLOBAL METADATA DEFAULTS
-   (per-page metadata in each page.tsx overrides these)
-   ============================================================ */
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  alternates: {
-    canonical: "/",
-  },
-  title: {
-    default: "SPEAR | All-in-One Hotel PMS, Restaurant POS & Channel Manager",
-    template: "%s | SPEAR",
-  },
-  description:
-    "Unify hotel direct booking, PMS, restaurant POS, table management, kitchen inventory, and channel distribution in one platform. Book a live demo today.",
-  keywords: [
-    "hotel PMS",
-    "restaurant POS software",
-    "hospitality management platform",
-    "hotel booking engine",
-    "channel manager 2-way sync",
-    "kitchen inventory software",
-  ],
-  authors: [{ name: "SPEAR" }],
-  creator: "SPEAR",
-  publisher: "SPEAR",
+  alternates: { canonical: "/" },
+  title: { default: TITLE, template: "%s | SPEAR OS" },
+  description: DESCRIPTION,
+  applicationName: "SPEAR OS",
+  publisher: COMPANY.name,
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "/",
-    siteName: "SPEAR",
-    title: "SPEAR | All-in-One Hotel PMS, Restaurant POS & Channel Manager",
-    description:
-      "Unify hotel direct booking, PMS, restaurant POS, table management, kitchen inventory, and channel distribution in one platform. Book a live demo today.",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "SPEAR — Hospitality Management Platform",
-      },
-    ],
+    siteName: "SPEAR OS",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "SPEAR OS" }],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "SPEAR | All-in-One Hotel PMS, Restaurant POS & Channel Manager",
-    description:
-      "Unify hotel direct booking, PMS, restaurant POS, table management, kitchen inventory, and channel distribution in one platform. Book a live demo today.",
-    images: ["/og-image.jpg"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION, images: ["/og-image.jpg"] },
+  robots: IS_PREVIEW ? { index: false, follow: false } : { index: true, follow: true },
 };
 
-/* ============================================================
-   ORGANIZATION JSON-LD — sitewide structured data
-   ============================================================ */
-const organizationSchema = {
+const organization = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "SPEAR",
-  description:
-    "All-in-One Hospitality Management Software: Hotel PMS, Restaurant POS, and Channel Manager.",
-  url: SITE_URL,
-  logo: {
-    "@type": "ImageObject",
-    url: `${SITE_URL}/og-image.jpg`,
-  },
-  contactPoint: {
-    "@type": "ContactPoint",
-    contactType: "sales",
-    email: "hello@spearplatform.com",
-  },
+  name: COMPANY.name,
+  url: COMPANY.url,
+  brand: { "@type": "Brand", name: "SPEAR OS", url: SITE_URL },
 };
 
-/* ============================================================
-   ROOT LAYOUT
-   ============================================================ */
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${playfair.variable} ${plusJakartaSans.variable}`}
-    >
+    <html lang="en" className={manrope.variable} suppressHydrationWarning>
       <head>
-        {/* Organization JSON-LD — present on every page */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema),
-          }}
-        />
+        {/* Lets the CSS hide the hero intro until GSAP plays it. Without scripts nothing is hidden. */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }} />
       </head>
-      <body className="antialiased">
-        {children}
-      </body>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }
