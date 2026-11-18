@@ -449,6 +449,135 @@ export function eventsDemo(k: DemoKit) {
   tl.call(step, [3]);
 }
 
+export function orderingDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  a.enter(330, 640);
+  tl.call(step, [0]);
+  a.move("od-add1");
+  a.click();
+  a.swap("od-cart", "1 item", "<");
+  a.move("od-add2", 0.5, 0.5, 0.5);
+  a.click();
+  a.swap("od-cart", "2 items", "<");
+  a.move("od-send", 0.5, 0.5, 0.7);
+  a.click();
+  a.show("od-sent", "<0.1", { scale: 0.96 });
+  tl.call(step, [1], "+=0.5");
+  tl.addLabel("tablet");
+  a.move("od-tab-item", 0.5, 0.5, 1);
+  a.click();
+  a.show("od-tab-new", "<0.1", { x: -12 });
+  a.move("od-fire", 0.5, 0.5, 0.8);
+  a.click();
+  a.show("od-fired", "<0.1", { scale: 0.96 });
+  a.leave(160, 40);
+  tl.call(step, [2], "+=0.2");
+  tl.addLabel("results");
+  a.show("od-b1", undefined, { x: 12 });
+  a.show("od-b2", "<0.2", { x: 12 });
+  a.swap("od-total", "$54.00", "<0.2");
+  a.show("od-k1", "+=0.2", { y: -8 });
+  a.show("od-k2", "<0.3", { y: -8 });
+  tl.call(step, [3], "+=0.5");
+}
+
+export function menusDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  a.enter(320, 650);
+  tl.call(step, [0]);
+  a.move("mn-dish");
+  a.click();
+  a.flash("mn-dish", "<");
+  a.hide("mn-empty", "<");
+  a.show("mn-recipe", "<0.1", { x: 20 });
+  tl.from(a.q("mn-rows").children, { autoAlpha: 0, y: 6, duration: 0.3, stagger: 0.08 }, "<0.2");
+  tl.call(step, [1], "+=0.6");
+  tl.addLabel("cost");
+  a.move("mn-fish-qty");
+  a.click();
+  a.swap("mn-fish-qty", "200 g", "<");
+  a.swap("mn-fish-cost", "$8.80", "<");
+  a.swap("mn-total", "$11.52", "+=0.2");
+  a.swap("mn-pct", "22.2%", "<");
+  a.swap("mn-margin", "$40.48", "<");
+  a.flash("mn-cost", "<");
+  a.leave(-140, 80);
+  tl.call(step, [2], "+=0.4");
+  tl.addLabel("out");
+  a.show("mn-out", undefined, { x: -10 });
+  [0, 1, 2].forEach((i) => {
+    a.swap(`mn-w${i}`, "Off", i ? "<0.15" : "+=0.3");
+    tl.to(a.q(`mn-w${i}`), { backgroundColor: "rgba(186,26,26,0.1)", color: "#ba1a1a", duration: 0.3 }, "<");
+    tl.to(a.q(`mn-w${i}-name`), { opacity: 0.45, textDecoration: "line-through", duration: 0.3 }, "<");
+  });
+  a.toast("mn-toast", "+=0.1");
+  tl.call(step, [3], "+=0.4");
+}
+
+export function floorDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  a.enter(760, 620);
+  tl.call(step, [0]);
+  a.move("fl-t14");
+  a.drag("fl-t14", "fl-spot");
+  tl.to(a.q("fl-t14"), { borderStyle: "solid", duration: 0.2 });
+  a.leave(120, 80);
+  tl.call(step, [1], "+=0.2");
+  tl.addLabel("booking");
+  a.toast("fl-toast");
+  a.show("fl-new", "<0.3", { x: 20 });
+  a.swap("fl-t5-state", "Booked 19:30", "+=0.3");
+  a.flash("fl-t5", "<");
+  a.hide("fl-toast", "+=1");
+  tl.call(step, [2], "+=0.2");
+  tl.addLabel("seat");
+  a.enter(1000, 640);
+  a.move("fl-seat");
+  a.click();
+  a.show("fl-opened", "<0.1", { scale: 0.96 });
+  a.swap("fl-t5-state", "Seated", "+=0.3");
+  tl.to(a.q("fl-t5"), { borderColor: "#c79a45", duration: 0.3 }, "<");
+  tl.to(a.q("fl-t5-state"), { backgroundColor: "rgba(199,154,69,0.15)", color: "#7c5801", duration: 0.3 }, "<");
+  a.flash("fl-t5", "<");
+  a.swap("fl-t9-state", "Free", "+=0.5");
+  tl.to(a.q("fl-t9"), { borderColor: "rgba(199,154,69,0.25)", duration: 0.3 }, "<");
+  tl.to(a.q("fl-t9-state"), { backgroundColor: "#ede5d4", color: "#5c4f44", duration: 0.3 }, "<");
+  a.flash("fl-t9", "<");
+  a.leave(-160, 60);
+  tl.call(step, [3]);
+}
+
+export function buffetDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  a.enter(460, 640);
+  tl.call(step, [0]);
+  a.move("bf-plus");
+  a.click();
+  a.swap("bf-head", "180", "<");
+  a.flash("bf-headbox", "<");
+  ["16.2 kg", "270", "21.6 kg", "360"].forEach((v, i) => a.swap(`bf-b${i}`, v, i ? "<0.15" : "+=0.2"));
+  a.leave(140, 90);
+  tl.call(step, [1], "+=0.3");
+  tl.addLabel("lines");
+  tl.to(a.q("bf-eggs-3"), { backgroundColor: "#ede5d4", duration: 0.35 }, "+=0.3");
+  tl.to(a.q("bf-eggs-2"), { backgroundColor: "#ede5d4", duration: 0.35 }, "+=0.4");
+  tl.to([a.q("bf-eggs-0"), a.q("bf-eggs-1")], { backgroundColor: "#ba1a1a", duration: 0.35 }, "<");
+  a.flash("bf-eggs-row", "<");
+  a.show("bf-alert", "+=0.2", { y: 8 });
+  a.toast("bf-toast", "+=0.4");
+  tl.call(step, [2], "+=0.8");
+  tl.addLabel("plates");
+  a.swap("bf-count", "118");
+  tl.to(a.q("bf-bar"), { width: "98%", duration: 0.8, ease: "power2.out" }, "<");
+  a.show("bf-limit", "+=0.2", { scale: 0.9 });
+  a.flash("bf-plates", "<");
+  tl.call(step, [3], "+=0.4");
+}
+
 // The hero: a new restaurant bill arrives on a room's folio a moment after the page settles.
 export function heroLoop(canvas: HTMLElement) {
   const row = el(canvas, "ov-new");
@@ -601,6 +730,36 @@ FILMS.events = {
   cues: [
     ["order-=0.6", { d: "ev-order", w: 430, ay: 0.4 }],
     ["sign", { d: "ev-order", w: 430, ay: 0.75 }],
+  ],
+};
+
+FILMS.ordering = {
+  start: { d: "od-phone", w: 430, ax: 0.62, ay: 0.55 },
+  cues: [
+    ["tablet-=0.7", { d: "od-tablet", w: 470, ay: 0.5 }],
+    ["results-=0.5", { d: "od-bill", w: 420, ax: 0.4, ay: 1.1 }],
+  ],
+};
+FILMS.menus = {
+  start: { d: "mn-dish", w: 460, ax: 0.75, ay: 0.6 },
+  cues: [
+    ["cost-=0.8", { d: "mn-recipe", w: 470, ay: 0.6 }],
+    ["out-=0.6", { d: "mn-recipe", w: 470, ay: 0.45 }],
+    ["out+=1.3", { d: "mn-where", w: 440, ax: 0.3, ay: 0.35 }],
+  ],
+};
+FILMS.floor = {
+  start: { d: "fl-t14", w: 520, ax: 1.2, ay: 1.4 },
+  cues: [
+    ["booking-=0.4", { d: "fl-list", w: 440, ay: 0.4 }],
+    ["seat+=1.2", { d: "fl-t5", w: 480, ax: 1.1, ay: 1.2 }],
+  ],
+};
+FILMS.buffet = {
+  start: { d: "bf-prep", w: 450, ay: 0.45 },
+  cues: [
+    ["lines-=0.6", { d: "bf-lines", w: 450, ay: 0.5 }],
+    ["plates-=0.6", { d: "bf-plates", w: 430, ay: 0.4 }],
   ],
 };
 

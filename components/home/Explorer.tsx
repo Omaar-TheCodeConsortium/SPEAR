@@ -8,14 +8,18 @@ import AppShell, { type RailKey } from "@/components/app/AppShell";
 import { FrontDeskScreen, HousekeepingScreen, KdsScreen, KitchenScreen, PmsScreen, RestaurantScreen, SoonScreen } from "@/components/app/screens";
 import {
   bookingDemo,
+  buffetDemo,
   buildDemo,
   channelDemo,
   eventsDemo,
   FILMS,
+  floorDemo,
   frontDeskDemo,
   housekeepingDemo,
   kdsDemo,
   kitchenDemo,
+  menusDemo,
+  orderingDemo,
   pmsDemo,
   posOfflineDemo,
   revenueDemo,
@@ -23,6 +27,7 @@ import {
   type Film,
 } from "@/components/app/demos";
 import { BookingScreen, ChannelScreen, EventsScreen, RevenueScreen } from "@/components/app/screens-hotel";
+import { BuffetScreen, FloorScreen, MenusScreen, OrderingScreen } from "@/components/app/screens-restaurant";
 import { MODULE_GROUPS, MODULE_INDEX, MODULES, type ModuleId } from "./modules";
 import { EYEBROW, SectionHead } from "./ui";
 
@@ -36,6 +41,10 @@ const DEMOS: Partial<Record<ModuleId, Demo>> = {
   events: { Screen: EventsScreen, rail: "overview", demo: eventsDemo, film: FILMS.events },
   pos: { Screen: RestaurantScreen, rail: "restaurant", demo: posOfflineDemo, film: FILMS.pos },
   kds: { Screen: KdsScreen, rail: "kitchen", demo: kdsDemo, film: FILMS.kds },
+  ordering: { Screen: OrderingScreen, rail: "restaurant", demo: orderingDemo, film: FILMS.ordering },
+  menus: { Screen: MenusScreen, rail: "kitchen", demo: menusDemo, film: FILMS.menus },
+  floor: { Screen: FloorScreen, rail: "restaurant", demo: floorDemo, film: FILMS.floor },
+  buffet: { Screen: BuffetScreen, rail: "restaurant", demo: buffetDemo, film: FILMS.buffet },
   inventory: { Screen: KitchenScreen, rail: "kitchen", demo: kitchenDemo, film: FILMS.kitchen },
   checkin: { Screen: FrontDeskScreen, rail: "desk", demo: frontDeskDemo, film: FILMS.desk },
   housekeeping: { Screen: HousekeepingScreen, rail: "housekeeping", demo: housekeepingDemo, film: FILMS.housekeeping },
