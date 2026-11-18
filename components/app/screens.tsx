@@ -5,9 +5,9 @@ import { BadgeCheck, BellRing, CalendarPlus, Check, Clock, IdCard, KeyRound, Rec
 // Each fills the 1136 × 700 content area of <AppShell>. Elements a demo changes carry data-d names;
 // elements that only appear during a demo start hidden ("invisible opacity-0") and GSAP reveals them.
 
-const HIDDEN = "invisible opacity-0";
+export const HIDDEN = "invisible opacity-0";
 
-type Tone = "neutral" | "brass" | "sage" | "rust" | "alert" | "dark";
+export type Tone = "neutral" | "brass" | "sage" | "rust" | "alert" | "dark";
 const TONES: Record<Tone, string> = {
   neutral: "bg-parchment text-taupe",
   brass: "bg-brass/15 text-brass-deep",
@@ -17,7 +17,7 @@ const TONES: Record<Tone, string> = {
   dark: "bg-espresso text-linen",
 };
 
-function Chip({ tone = "neutral", children, d, className = "" }: { tone?: Tone; children: ReactNode; d?: string; className?: string }) {
+export function Chip({ tone = "neutral", children, d, className = "" }: { tone?: Tone; children: ReactNode; d?: string; className?: string }) {
   return (
     <span data-d={d} className={`inline-flex items-center gap-1 whitespace-nowrap rounded px-2 py-0.5 text-[11px] font-semibold ${TONES[tone]} ${className}`}>
       {children}
@@ -25,11 +25,11 @@ function Chip({ tone = "neutral", children, d, className = "" }: { tone?: Tone; 
   );
 }
 
-function Label({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function Label({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <p className={`text-[11px] font-semibold uppercase tracking-[0.07em] text-taupe ${className}`}>{children}</p>;
 }
 
-function Btn({ tone = "light", children, d, className = "" }: { tone?: "light" | "brass" | "dark"; children: ReactNode; d?: string; className?: string }) {
+export function Btn({ tone = "light", children, d, className = "" }: { tone?: "light" | "brass" | "dark"; children: ReactNode; d?: string; className?: string }) {
   const look = {
     light: "border border-line bg-cream text-espresso",
     brass: "bg-brass text-espresso",
@@ -42,7 +42,7 @@ function Btn({ tone = "light", children, d, className = "" }: { tone?: "light" |
   );
 }
 
-function Card({ children, className = "", d }: { children: ReactNode; className?: string; d?: string }) {
+export function Card({ children, className = "", d }: { children: ReactNode; className?: string; d?: string }) {
   return (
     <div data-d={d} className={`rounded-lg border border-line bg-cream ${className}`}>
       {children}
@@ -50,7 +50,7 @@ function Card({ children, className = "", d }: { children: ReactNode; className?
   );
 }
 
-function Head({ label, title, right }: { label: string; title: string; right?: ReactNode }) {
+export function Head({ label, title, right }: { label: string; title: string; right?: ReactNode }) {
   return (
     <div className="flex items-end justify-between">
       <div>
@@ -65,7 +65,7 @@ function Head({ label, title, right }: { label: string; title: string; right?: R
   );
 }
 
-function Toast({ d, icon, title, line }: { d: string; icon: ReactNode; title: string; line: string }) {
+export function Toast({ d, icon, title, line }: { d: string; icon: ReactNode; title: string; line: string }) {
   return (
     <div data-d={d} className={`absolute right-7 top-5 z-40 flex w-[330px] items-start gap-3 rounded-lg border border-sage/40 bg-cream p-4 shadow-[0_16px_36px_-8px_rgba(34,27,22,0.22)] ${HIDDEN}`}>
       <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-sage/15 text-sage-deep">{icon}</span>
@@ -77,7 +77,7 @@ function Toast({ d, icon, title, line }: { d: string; icon: ReactNode; title: st
   );
 }
 
-function Bar({ value, tone = "brass", d }: { value: number; tone?: "brass" | "alert" | "sage" | "taupe"; d?: string }) {
+export function Bar({ value, tone = "brass", d }: { value: number; tone?: "brass" | "alert" | "sage" | "taupe"; d?: string }) {
   const fill = { brass: "bg-brass", alert: "bg-alert", sage: "bg-sage", taupe: "bg-taupe/60" }[tone];
   return (
     <span className="block h-2 w-full overflow-hidden rounded-full bg-parchment">
@@ -86,7 +86,7 @@ function Bar({ value, tone = "brass", d }: { value: number; tone?: "brass" | "al
   );
 }
 
-function Avatar({ initials, tone = "neutral" }: { initials: string; tone?: "neutral" | "brass" }) {
+export function Avatar({ initials, tone = "neutral" }: { initials: string; tone?: "neutral" | "brass" }) {
   return (
     <span className={`flex h-10 w-10 flex-none items-center justify-center rounded-full text-[13px] font-bold ${tone === "brass" ? "bg-brass/20 text-brass-deep" : "bg-parchment text-taupe"}`}>
       {initials}
@@ -357,7 +357,7 @@ export function FrontDeskScreen() {
 /* ---------- 2. Rooms: the tape chart and a folio ---------- */
 
 export const DAY_W = 76;
-const DAYS = [
+export const DAYS = [
   ["Wed", "3"],
   ["Thu", "4"],
   ["Fri", "5"],

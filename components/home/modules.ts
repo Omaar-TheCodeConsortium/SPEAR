@@ -69,7 +69,7 @@ export const MODULE_GROUPS: { name: string; modules: ModuleInfo[] }[] = [
         id: "events",
         name: "Sales and banqueting",
         line: "Event orders that book rooms, spaces and food.",
-        uses: ["Events move from enquiry to confirmed", "One signed event order for layout, AV, menus and billing", "Signing it blocks rooms, holds spaces and orders food"],
+        uses: ["Every event in one pipeline, enquiry to confirmed", "One event order for layout, AV, menus and billing", "Signing it blocks rooms, holds spaces and orders food"],
         links: [
           ["pms", "Blocks the guest rooms"],
           ["floor", "Holds the dining spaces"],

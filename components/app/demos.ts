@@ -90,6 +90,25 @@ function kit({ tl, canvas, cursor }: DemoKit) {
       tl.to(el(canvas, name), { boxShadow: "0 0 0 0 rgba(34,27,22,0)", duration: 0.25 });
       tl.to(cursor, { scale: 1, duration: 0.15 }, "<");
     },
+    // Slide an element onto another one's place, with no cursor.
+    carry(name: string, to: string, at?: gsap.Position, duration = 0.9) {
+      const delta = { y: 0 };
+      tl.to(
+        el(canvas, name),
+        {
+          x: () => {
+            const a = point(canvas, el(canvas, name), 0, 0);
+            const b = point(canvas, el(canvas, to), 0, 0);
+            delta.y = b.y - a.y;
+            return `+=${b.x - a.x}`;
+          },
+          y: () => `+=${delta.y}`,
+          duration,
+          ease: "power3.inOut",
+        },
+        at,
+      );
+    },
     toast(name: string, at?: gsap.Position) {
       tl.fromTo(el(canvas, name), { autoAlpha: 0, y: -14 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: "back.out(1.6)" }, at);
     },
@@ -319,6 +338,117 @@ export function posOfflineDemo(k: DemoKit) {
   tl.call(step, [3], "+=0.4");
 }
 
+export function bookingDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  a.enter(420, 660);
+  tl.call(step, [0]);
+  a.move("bk-room", 0.45, 0.5);
+  a.click();
+  tl.to(a.q("bk-room"), { borderColor: "#c79a45", backgroundColor: "rgba(199,154,69,0.12)", duration: 0.3 }, "<");
+  a.show("bk-tick", "<", { scale: 0.4 });
+  a.move("bk-book", 0.5, 0.5, 0.9);
+  a.click();
+  a.show("bk-done", "<0.1", { scale: 0.96 });
+  tl.call(step, [1], "+=0.6");
+  tl.addLabel("paid");
+  a.swap("bk-count", "65");
+  a.flash("bk-stats", "<");
+  a.swap("bk-saved", "$4,310", "+=0.3");
+  tl.call(step, [2], "+=0.7");
+  tl.addLabel("avail");
+  a.swap("bk-left", "1");
+  a.flash("bk-avail", "<");
+  a.swap("bk-site-left", "1 left", "<");
+  ["bk-c0", "bk-c1", "bk-c2", "bk-c3"].forEach((n, i) => a.swap(n, "1 left", i ? "<0.15" : "+=0.2"));
+  a.leave(160, 40);
+  tl.call(step, [3]);
+}
+
+export function channelDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  a.enter(700, 640);
+  tl.call(step, [0]);
+  a.move("ch-rate");
+  a.click();
+  a.swap("ch-rate", "$309", "+=0.1");
+  a.move("ch-update", 0.5, 0.5, 0.7);
+  a.click();
+  tl.addLabel("spread");
+  [0, 1, 2, 3].forEach((i) => {
+    a.swap(`ch-r${i}`, "$309", i ? "<0.18" : "+=0.15");
+    a.flash(`ch-row${i}`, "<");
+  });
+  a.leave(-120, 90);
+  tl.call(step, [1], "+=0.5");
+  tl.addLabel("queue");
+  a.show("ch-q1", undefined, { x: 24 });
+  a.show("ch-q2", "<0.25", { x: 24 });
+  a.show("ch-q1s", "+=0.5", { scale: 0.9 });
+  a.show("ch-q2s", "+=0.35", { scale: 0.9 });
+  [0, 1, 2, 3].forEach((i) => a.swap(`ch-l${i}`, "0", i ? "<0.1" : "<"));
+  tl.call(step, [2], "+=0.8");
+  tl.addLabel("direct");
+  a.show("ch-q3", undefined, { x: 24 });
+  a.flash("ch-q3", "<0.2");
+  a.swap("ch-mix", "Direct 39%", "<");
+  tl.to(a.q("ch-mixbar"), { width: "39%", duration: 0.6 }, "<");
+  tl.call(step, [3], "+=0.4");
+}
+
+export function revenueDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  tl.call(step, [0]);
+  tl.addLabel("grow", "+=0.3");
+  tl.to(a.q("rv-sat-fill"), { height: `${86 * 0.8}%`, duration: 1.4, ease: "power2.inOut" }, "grow");
+  a.swap("rv-sat-occ", "86%", "grow+=0.8");
+  a.swap("rv-sat-rate", "$324", "+=0.25");
+  a.flash("rv-sat", "<");
+  tl.call(step, [1], "+=0.5");
+  tl.addLabel("push");
+  a.show("rv-pushed", undefined, { y: 10 });
+  tl.call(step, [2], "+=0.9");
+  tl.addLabel("market");
+  a.enter(1060, 660);
+  a.move("rv-apply");
+  a.click();
+  a.show("rv-applied", "<0.1", { scale: 0.96 });
+  a.swap("rv-sun-rate", "$305", "+=0.2");
+  a.flash("rv-sun", "<");
+  a.leave(-140, 40);
+  tl.call(step, [3]);
+}
+
+export function eventsDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  a.enter(560, 640);
+  tl.call(step, [0]);
+  a.move("ev-card");
+  a.click();
+  a.flash("ev-card", "<");
+  a.hide("ev-empty", "<");
+  a.show("ev-order", "<0.1", { x: 24 });
+  tl.call(step, [1], "+=0.4");
+  tl.addLabel("order");
+  ["ev-s1", "ev-s2", "ev-s3", "ev-s4"].forEach((n, i) => a.flash(n, i ? "<0.35" : "+=0.1"));
+  tl.call(step, [2], "+=0.9");
+  tl.addLabel("sign");
+  a.move("ev-sign", 0.5, 0.5, 0.9);
+  a.click();
+  a.show("ev-signed", "<0.1", { scale: 0.96 });
+  a.carry("ev-card", "ev-slot", "+=0.2");
+  a.swap("ev-tcount", "1", "<0.4");
+  a.swap("ev-ccount", "2", "<");
+  a.show("ev-fx", "+=0.1", { y: 8 });
+  tl.from(a.q("ev-fx").children, { autoAlpha: 0, x: -8, duration: 0.35, stagger: 0.25 }, "<0.1");
+  a.toast("ev-toast", "+=0.2");
+  a.leave(-140, 60);
+  tl.call(step, [3]);
+}
+
 // The hero: a new restaurant bill arrives on a room's folio a moment after the page settles.
 export function heroLoop(canvas: HTMLElement) {
   const row = el(canvas, "ov-new");
@@ -441,6 +571,36 @@ FILMS.pos = {
   cues: [
     ["table+=0.9", { x: 765, y: 200, w: 430 }],
     ["online-=0.3", { d: "rs-online", w: 480, ax: 0.6, ay: 0.85 }],
+  ],
+};
+
+FILMS.booking = {
+  start: { d: "bk-room", w: 470, ax: 0.5, ay: 0.4 },
+  cues: [
+    ["paid-=0.2", { d: "bk-stats", w: 430, ay: 0.7 }],
+    ["avail-=0.1", { d: "bk-avail", w: 430, ay: 0.45 }],
+  ],
+};
+FILMS.channel = {
+  start: { d: "ch-editor", w: 470, ax: 0.78, ay: 1.4 },
+  cues: [
+    ["spread", { x: 92, y: 150, w: 520 }],
+    ["queue-=0.6", { d: "ch-queue", w: 430, ay: 0.55 }],
+    ["direct+=0.6", { d: "ch-queue", w: 430, ay: 0.7 }],
+  ],
+};
+FILMS.revenue = {
+  start: { d: "rv-chart", w: 480, ax: 0.5, ay: 0.4 },
+  cues: [
+    ["push-=0.3", { d: "rv-chart", w: 520, ax: 0.5, ay: 0.62 }],
+    ["market-=0.8", { d: "rv-market", w: 430, ay: 0.6 }],
+  ],
+};
+FILMS.events = {
+  start: { d: "ev-card", w: 460, ax: 0.75, ay: 0.6 },
+  cues: [
+    ["order-=0.6", { d: "ev-order", w: 430, ay: 0.4 }],
+    ["sign", { d: "ev-order", w: 430, ay: 0.75 }],
   ],
 };
 

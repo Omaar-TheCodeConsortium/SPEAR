@@ -7,7 +7,10 @@ import Stage, { Cursor } from "@/components/app/Stage";
 import AppShell, { type RailKey } from "@/components/app/AppShell";
 import { FrontDeskScreen, HousekeepingScreen, KdsScreen, KitchenScreen, PmsScreen, RestaurantScreen, SoonScreen } from "@/components/app/screens";
 import {
+  bookingDemo,
   buildDemo,
+  channelDemo,
+  eventsDemo,
   FILMS,
   frontDeskDemo,
   housekeepingDemo,
@@ -15,9 +18,11 @@ import {
   kitchenDemo,
   pmsDemo,
   posOfflineDemo,
+  revenueDemo,
   type DemoKit,
   type Film,
 } from "@/components/app/demos";
+import { BookingScreen, ChannelScreen, EventsScreen, RevenueScreen } from "@/components/app/screens-hotel";
 import { MODULE_GROUPS, MODULE_INDEX, MODULES, type ModuleId } from "./modules";
 import { EYEBROW, SectionHead } from "./ui";
 
@@ -25,6 +30,10 @@ import { EYEBROW, SectionHead } from "./ui";
 type Demo = { Screen: ComponentType; rail: RailKey; demo: (kit: DemoKit) => void; film: Film };
 const DEMOS: Partial<Record<ModuleId, Demo>> = {
   pms: { Screen: PmsScreen, rail: "rooms", demo: pmsDemo, film: FILMS.pms },
+  booking: { Screen: BookingScreen, rail: "rooms", demo: bookingDemo, film: FILMS.booking },
+  channel: { Screen: ChannelScreen, rail: "rooms", demo: channelDemo, film: FILMS.channel },
+  revenue: { Screen: RevenueScreen, rail: "rooms", demo: revenueDemo, film: FILMS.revenue },
+  events: { Screen: EventsScreen, rail: "overview", demo: eventsDemo, film: FILMS.events },
   pos: { Screen: RestaurantScreen, rail: "restaurant", demo: posOfflineDemo, film: FILMS.pos },
   kds: { Screen: KdsScreen, rail: "kitchen", demo: kdsDemo, film: FILMS.kds },
   inventory: { Screen: KitchenScreen, rail: "kitchen", demo: kitchenDemo, film: FILMS.kitchen },
@@ -195,15 +204,28 @@ export default function Explorer() {
 
   // A link like spear-os.com/#modules/pms opens that mod.
   useEffect(() => {
-    const id = window.location.hash.match(/^#modules\/([a-z]+)$/)?.[1] as ModuleId | undefined;
-    if (!id || !(id in MODULE_INDEX)) return;
-    const frame = requestAnimationFrame(() => {
-      setSel(MODULE_INDEX[id]);
-      const wide = window.matchMedia(wideQuery).matches;
-      const target = wide ? document.querySelector("[data-mnav]") : document.getElementById(`m-${id}`);
-      if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 90 });
-    });
-    return () => cancelAnimationFrame(frame);
+    let frame = 0;
+    const open = () => {
+      const id = window.location.hash.match(/^#modules\/([a-z]+)$/)?.[1] as ModuleId | undefined;
+      if (!id || !(id in MODULE_INDEX)) return;
+      frame = requestAnimationFrame(() => {
+        setSel(MODULE_INDEX[id]);
+        setDone(false);
+        setPhoneOpen(true);
+        // Scroll once the newly opened module has been drawn.
+        frame = requestAnimationFrame(() => {
+          const wide = window.matchMedia(wideQuery).matches;
+          const target = wide ? document.querySelector("[data-mnav]") : document.getElementById(`m-${id}`);
+          if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 90 });
+        });
+      });
+    };
+    open();
+    window.addEventListener("hashchange", open);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("hashchange", open);
+    };
   }, []);
 
   // On phones, bring the opened module to the top of the screen.
