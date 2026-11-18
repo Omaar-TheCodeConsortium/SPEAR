@@ -578,6 +578,133 @@ export function buffetDemo(k: DemoKit) {
   tl.call(step, [3], "+=0.4");
 }
 
+export function messagingDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  tl.call(step, [0]);
+  a.show("ms-new", "+=0.3", { x: -12 });
+  a.flash("ms-new", "<0.2");
+  a.show("ms-in", "<0.2", { y: 8 });
+  a.enter(760, 660, "+=0.3");
+  a.move("ms-send");
+  a.click();
+  a.show("ms-out", "<0.1", { y: 10 });
+  a.leave(140, 60);
+  tl.call(step, [1], "+=0.3");
+  tl.addLabel("fallback");
+  a.show("ms-ready", undefined, { x: 16 });
+  a.flash("ms-f1", "+=0.5");
+  a.show("ms-f2", "+=0.6", { x: -8 });
+  tl.call(step, [2], "+=0.8");
+  tl.addLabel("conf");
+  a.show("ms-conf", undefined, { x: 16 });
+  a.flash("ms-conf", "<0.2");
+  tl.call(step, [3], "+=0.5");
+}
+
+export function profilesDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  a.enter(420, 650);
+  tl.call(step, [0]);
+  a.move("pr-add");
+  a.click();
+  a.show("pr-newpref", "<0.1", { scale: 0.7 });
+  a.flash("pr-diet", "+=0.3");
+  a.leave(150, 40);
+  tl.call(step, [1], "+=0.2");
+  tl.addLabel("spend");
+  a.show("pr-new", undefined, { y: -10 });
+  a.flash("pr-new", "<0.2");
+  a.swap("pr-rest", "$3,860", "+=0.5");
+  a.swap("pr-total", "$14,280", "<");
+  a.flash("pr-spend", "<");
+  tl.call(step, [2], "+=0.7");
+  tl.addLabel("private");
+  a.flash("pr-private");
+  a.show("pr-ok", "<0.2", { scale: 0.9 });
+  tl.call(step, [3], "+=0.5");
+}
+
+export function locksDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  tl.call(step, [0]);
+  a.show("lk-pass", "+=0.3", { y: 40 });
+  tl.call(step, [1], "+=0.9");
+  tl.addLabel("door");
+  tl.to(a.q("lk-pass"), { y: -8, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" });
+  a.show("lk-open", undefined, { scale: 0.9 });
+  a.show("lk-door", "<0.2", { x: -8 });
+  a.flash("lk-salto", "<");
+  tl.call(step, [2], "+=0.9");
+  tl.addLabel("extend");
+  a.enter(620, 660);
+  a.move("lk-extend");
+  a.click();
+  a.swap("lk-until", "Wallet · until Mon 8 Oct, 11:00", "<0.1");
+  a.swap("lk-pass-dates", "Thu 4 – Mon 8 Oct", "<");
+  a.flash("lk-row", "<");
+  tl.addLabel("checkout", "+=0.6");
+  a.move("lk-checkout", 0.5, 0.5, 0.7);
+  a.click();
+  a.swap("lk-status", "Stopped", "<0.1");
+  tl.to(a.q("lk-status"), { backgroundColor: "rgba(186,26,26,0.1)", color: "#ba1a1a", duration: 0.3 }, "<");
+  tl.to(a.q("lk-pass"), { opacity: 0.35, duration: 0.4 }, "<");
+  a.hide("lk-open", "<");
+  a.show("lk-void", "<0.2", { y: 6 });
+  a.leave(-150, 40);
+  tl.call(step, [3]);
+}
+
+export function staffDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  a.enter(420, 660);
+  tl.call(step, [0]);
+  a.move("st-add");
+  a.click();
+  a.show("st-new", "<0.2", { x: -12 });
+  a.flash("st-new", "<0.2");
+  a.leave(160, 40);
+  tl.call(step, [1], "+=0.3");
+  tl.addLabel("clock");
+  a.flash("st-qr");
+  a.show("st-face", "+=0.4", { scale: 0.6 });
+  a.flash("st-face", "<0.2");
+  a.show("st-ok", "+=0.6", { y: 8 });
+  a.swap("st-nim", "On", "<");
+  tl.to(a.q("st-nim"), { backgroundColor: "rgba(78,115,86,0.15)", color: "#36533d", duration: 0.3 }, "<");
+  tl.call(step, [2], "+=0.7");
+  tl.addLabel("task");
+  a.show("st-task", undefined, { x: 10 });
+  a.flash("st-task", "<0.2");
+  tl.call(step, [3], "+=0.5");
+}
+
+export function websiteDemo(k: DemoKit) {
+  const { tl, step } = k;
+  const a = kit(k);
+  tl.call(step, [0]);
+  a.flash("ws-domain", "+=0.6");
+  tl.call(step, [1], "+=1");
+  tl.addLabel("photo");
+  a.enter(330, 660);
+  a.move("ws-replace");
+  a.click();
+  tl.fromTo(a.q("ws-hero2"), { autoAlpha: 0 }, { autoAlpha: 1, duration: 1, ease: "power2.inOut" }, "+=0.2");
+  a.toast("ws-toast", "<0.5");
+  tl.call(step, [2], "+=0.9");
+  tl.addLabel("table");
+  a.hide("ws-toast");
+  a.move("ws-table", 0.5, 0.5, 1);
+  a.click();
+  a.show("ws-booked", "<0.1", { scale: 0.96 });
+  a.flash("ws-tablebox", "<");
+  a.leave(120, 60);
+  tl.call(step, [3]);
+}
+
 // The hero: a new restaurant bill arrives on a room's folio a moment after the page settles.
 export function heroLoop(canvas: HTMLElement) {
   const row = el(canvas, "ov-new");
@@ -760,6 +887,41 @@ FILMS.buffet = {
   cues: [
     ["lines-=0.6", { d: "bf-lines", w: 450, ay: 0.5 }],
     ["plates-=0.6", { d: "bf-plates", w: 430, ay: 0.4 }],
+  ],
+};
+
+FILMS.messaging = {
+  start: { d: "ms-thread", w: 470, ay: 0.62 },
+  cues: [["fallback-=0.6", { d: "ms-auto", w: 430, ay: 0.4 }]],
+};
+FILMS.profiles = {
+  start: { d: "pr-prefs", w: 430, ay: 0.5 },
+  cues: [
+    ["spend-=0.6", { d: "pr-history", w: 470, ay: 0.4 }],
+    ["spend+=1", { d: "pr-spend", w: 420, ay: 0.85 }],
+  ],
+};
+FILMS.locks = {
+  start: { d: "lk-phone", w: 430, ax: 0.62, ay: 0.45 },
+  cues: [
+    ["door", { d: "lk-locks", w: 420, ay: 0.6 }],
+    ["extend-=0.7", { d: "lk-keys", w: 470, ay: 0.55 }],
+    ["checkout+=1.6", { d: "lk-phone", w: 460, ax: 0.9, ay: 0.45 }],
+  ],
+};
+FILMS.staff = {
+  start: { d: "st-rota", w: 520, ax: 0.45, ay: 0.45 },
+  cues: [
+    ["clock-=0.6", { d: "st-phone", w: 420, ay: 0.45 }],
+    ["task-=0.5", { d: "st-tasks", w: 420, ay: 0.6 }],
+  ],
+};
+FILMS.website = {
+  start: { x: 690, y: 30, w: 500 },
+  cues: [
+    ["photo-=0.7", { d: "ws-slots", w: 440, ax: 0.7, ay: 0.35 }],
+    ["photo+=1.6", { d: "ws-site", w: 580, ax: 0.32, ay: 0.5 }],
+    ["table-=0.4", { d: "ws-tablebox", w: 440, ay: 0.3 }],
   ],
 };
 

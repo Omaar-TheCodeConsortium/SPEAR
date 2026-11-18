@@ -18,20 +18,26 @@ import {
   housekeepingDemo,
   kdsDemo,
   kitchenDemo,
+  locksDemo,
   menusDemo,
+  messagingDemo,
   orderingDemo,
   pmsDemo,
   posOfflineDemo,
+  profilesDemo,
   revenueDemo,
+  staffDemo,
+  websiteDemo,
   type DemoKit,
   type Film,
 } from "@/components/app/demos";
 import { BookingScreen, ChannelScreen, EventsScreen, RevenueScreen } from "@/components/app/screens-hotel";
 import { BuffetScreen, FloorScreen, MenusScreen, OrderingScreen } from "@/components/app/screens-restaurant";
+import { LocksScreen, MessagingScreen, ProfilesScreen, StaffScreen, WebsiteScreen } from "@/components/app/screens-guests";
 import { MODULE_GROUPS, MODULE_INDEX, MODULES, type ModuleId } from "./modules";
 import { EYEBROW, SectionHead } from "./ui";
 
-// The modules that have a demo so far. The rest show a placeholder until theirs is built.
+// Every module's screen and demo. A module without one would show a placeholder.
 type Demo = { Screen: ComponentType; rail: RailKey; demo: (kit: DemoKit) => void; film: Film };
 const DEMOS: Partial<Record<ModuleId, Demo>> = {
   pms: { Screen: PmsScreen, rail: "rooms", demo: pmsDemo, film: FILMS.pms },
@@ -48,6 +54,11 @@ const DEMOS: Partial<Record<ModuleId, Demo>> = {
   inventory: { Screen: KitchenScreen, rail: "kitchen", demo: kitchenDemo, film: FILMS.kitchen },
   checkin: { Screen: FrontDeskScreen, rail: "desk", demo: frontDeskDemo, film: FILMS.desk },
   housekeeping: { Screen: HousekeepingScreen, rail: "housekeeping", demo: housekeepingDemo, film: FILMS.housekeeping },
+  messaging: { Screen: MessagingScreen, rail: "desk", demo: messagingDemo, film: FILMS.messaging },
+  profiles: { Screen: ProfilesScreen, rail: "desk", demo: profilesDemo, film: FILMS.profiles },
+  locks: { Screen: LocksScreen, rail: "desk", demo: locksDemo, film: FILMS.locks },
+  staff: { Screen: StaffScreen, rail: "housekeeping", demo: staffDemo, film: FILMS.staff },
+  website: { Screen: WebsiteScreen, rail: "overview", demo: websiteDemo, film: FILMS.website },
 };
 const GROUP_RAIL: Record<string, RailKey> = { Hotel: "rooms", Restaurant: "restaurant", Guests: "desk", "Property and staff": "housekeeping" };
 
