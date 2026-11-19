@@ -60,8 +60,9 @@ function kit({ tl, canvas, cursor }: DemoKit) {
     flash(name: string, at?: gsap.Position) {
       tl.fromTo(
         el(canvas, name),
-        { boxShadow: "0 0 0 3px rgba(199,154,69,0.85)" },
-        { boxShadow: "0 0 0 3px rgba(199,154,69,0)", duration: 1.4, ease: "power2.out", immediateRender: false },
+        // Drawn inside the element's edge, so it never crowds a neighbour or gets cut off by a panel.
+        { boxShadow: "inset 0 0 0 2px rgba(199,154,69,0.9), inset 0 0 0 60px rgba(199,154,69,0.1)" },
+        { boxShadow: "inset 0 0 0 2px rgba(199,154,69,0), inset 0 0 0 60px rgba(199,154,69,0)", duration: 1.4, ease: "power2.out", immediateRender: false, clearProps: "boxShadow" },
         at,
       );
     },

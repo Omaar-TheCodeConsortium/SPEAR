@@ -1,5 +1,6 @@
 import { BedDouble, CalendarCheck, Check, ChefHat, Globe, MapPin, Mic, PenLine, Receipt, TrendingUp, Users, UtensilsCrossed } from "lucide-react";
 import { Avatar, Btn, Card, Chip, DAYS, Head, HIDDEN, Label, Toast } from "./screens";
+import { asset } from "@/lib/constants";
 import { CHANNEL, CHANNEL_IDS, ChannelChip, ChannelLogo, type ChannelId } from "@/components/brands";
 
 // Hotel group screens for the module explorer. Same rules as screens.tsx: sample data only,
@@ -9,9 +10,9 @@ import { CHANNEL, CHANNEL_IDS, ChannelChip, ChannelLogo, type ChannelId } from "
 /* ---------- Booking engine: a direct booking on the hotel's own site ---------- */
 
 const OFFERS = [
-  { name: "Deluxe king", line: "Sea view · 32 m² · breakfast included", price: "$289", d: "bk-room", left: "2 left" },
-  { name: "Junior suite", line: "Terrace · 48 m² · breakfast included", price: "$410", left: "4 left" },
-  { name: "Garden suite", line: "Private garden · 60 m²", price: "$520", left: "1 left" },
+  { name: "Deluxe king", line: "Sea view · 32 m² · breakfast included", price: "$289", d: "bk-room", left: "2 left", photo: "deluxe-king" },
+  { name: "Junior suite", line: "Terrace · 48 m² · breakfast included", price: "$410", left: "4 left", photo: "junior-suite" },
+  { name: "Garden suite", line: "Private garden · 60 m²", price: "$520", left: "1 left", photo: "garden-suite" },
 ];
 
 export function BookingScreen() {
@@ -39,7 +40,8 @@ export function BookingScreen() {
             <div className="mt-3 space-y-2">
               {OFFERS.map((o) => (
                 <div key={o.name} data-d={o.d} className="relative flex items-center gap-4 rounded-lg border border-line bg-linen/60 px-4 py-3">
-                  <span className="h-12 w-16 flex-none rounded-md bg-[linear-gradient(135deg,#ede5d4,#c79a45)] opacity-60" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={asset(`/demo/${o.photo}.webp`)} alt="" width={128} height={96} loading="lazy" className="h-12 w-16 flex-none rounded-md object-cover" />
                   <span className="min-w-0 flex-1">
                     <span className="block font-semibold">{o.name}</span>
                     <span className="block text-[12px] text-taupe">{o.line}</span>
