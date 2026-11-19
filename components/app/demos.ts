@@ -61,7 +61,16 @@ function kit({ tl, canvas, cursor }: DemoKit) {
       tl.fromTo(
         el(canvas, name),
         { boxShadow: "0 0 0 3px rgba(199,154,69,0.85)" },
-        { boxShadow: "0 0 0 3px rgba(199,154,69,0)", duration: 1.4, ease: "power2.out" },
+        { boxShadow: "0 0 0 3px rgba(199,154,69,0)", duration: 1.4, ease: "power2.out", immediateRender: false },
+        at,
+      );
+    },
+    // A soft brass wash, for rows that sit flush against each other where rings would merge.
+    wash(name: string, at?: gsap.Position) {
+      tl.fromTo(
+        el(canvas, name),
+        { backgroundColor: "rgba(199,154,69,0.2)" },
+        { backgroundColor: "rgba(199,154,69,0)", duration: 1.2, ease: "power2.out", immediateRender: false, clearProps: "backgroundColor" },
         at,
       );
     },
@@ -378,7 +387,7 @@ export function channelDemo(k: DemoKit) {
   tl.addLabel("spread");
   [0, 1, 2, 3, 4].forEach((i) => {
     a.swap(`ch-r${i}`, "$309", i ? "<0.18" : "+=0.15");
-    a.flash(`ch-row${i}`, "<");
+    a.wash(`ch-row${i}`, "<");
   });
   a.leave(-120, 90);
   tl.call(step, [1], "+=0.5");
