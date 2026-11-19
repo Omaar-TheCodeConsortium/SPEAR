@@ -162,6 +162,9 @@ export default function Showcase() {
             canvas.querySelectorAll("[data-rail]").forEach((item, k) => item.classList.toggle("is-active", k === railIndex));
             if (previous !== index) {
               if (previous >= 0) gsap.to(screens[previous], { autoAlpha: 0, y: -14, duration: 0.3, ease: "power2.in", overwrite: true });
+              // The first screen shows before anything has played. Arriving from below (a nav link, or a reload
+              // further down the page) can start on a later area, so hide every other screen first.
+              else gsap.set(screens.filter((_, k) => k !== index), { autoAlpha: 0, overwrite: true });
               gsap.fromTo(screens[index], { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.55, delay: previous >= 0 ? 0.2 : 0, ease: "power3.out", overwrite: true });
               gsap.to(indicator, { y: railIndex * RAIL_STEP, duration: 0.6, ease: "power3.inOut" });
             }
