@@ -1,10 +1,10 @@
 import { BedDouble, CalendarCheck, Check, ChefHat, Globe, MapPin, Mic, PenLine, Receipt, TrendingUp, Users, UtensilsCrossed } from "lucide-react";
 import { Avatar, Btn, Card, Chip, DAYS, Head, HIDDEN, Label, Toast } from "./screens";
+import { CHANNEL, CHANNEL_IDS, ChannelChip, ChannelLogo, type ChannelId } from "@/components/brands";
 
 // Hotel group screens for the module explorer. Same rules as screens.tsx: sample data only,
 // data-d names for what a demo changes, HIDDEN for what a demo reveals.
 
-const CHANNELS = ["Your website", "Booking.com", "Expedia", "Agoda"];
 
 /* ---------- Booking engine: a direct booking on the hotel's own site ---------- */
 
@@ -87,9 +87,12 @@ export function BookingScreen() {
               <span className="text-taupe">rooms left</span>
             </p>
             <div className="mt-4">
-              {CHANNELS.map((c, i) => (
-                <p key={c} className="flex items-center justify-between border-t border-line-soft py-2 text-[13px]">
-                  <span>{c}</span>
+              {CHANNEL_IDS.map((c, i) => (
+                <p key={c} className="flex items-center justify-between border-t border-line-soft py-1.5 text-[13px]">
+                  <span className="flex items-center gap-2">
+                    <ChannelLogo id={c} size={18} />
+                    {CHANNEL[c].name}
+                  </span>
                   <span data-d={`bk-c${i}`} className="font-semibold tabular-nums">2 left</span>
                 </p>
               ))}
@@ -103,16 +106,25 @@ export function BookingScreen() {
 
 /* ---------- Channel manager: one rate everywhere, bookings in order ---------- */
 
-const QUEUE_OLD = [
-  ["Booking.com", "18:12:40", "Junior suite · Fri", "Confirmed · Room 410"],
-  ["Your website", "18:30:05", "Deluxe twin · Sun", "Confirmed · Room 302"],
+const QUEUE_OLD: [ChannelId, string, string, string][] = [
+  ["airbnb", "18:12:40", "Junior suite · Fri", "Confirmed · Room 410"],
+  ["direct", "18:30:05", "Deluxe twin · Sun", "Confirmed · Room 302"],
 ];
 
-function QueueRow({ d, source, time, what, children, direct = false }: { d?: string; source: string; time: string; what: string; children: React.ReactNode; direct?: boolean }) {
+// Share of this month's bookings by channel, for the bar under the table. Direct is animated by the demo.
+const MIX: [ChannelId, number][] = [
+  ["booking", 27],
+  ["expedia", 14],
+  ["agoda", 11],
+  ["airbnb", 10],
+];
+
+function QueueRow({ d, source, time, what, children }: { d?: string; source: ChannelId; time: string; what: string; children: React.ReactNode }) {
   return (
-    <div data-d={d} className={`border-t border-line-soft py-3 ${d ? HIDDEN : ""}`}>
+    <div data-d={d} className={`relative border-t border-line-soft py-3 pl-3 ${d ? HIDDEN : ""}`}>
+      <span className="absolute bottom-3 left-0 top-3 w-[3px] rounded-full" style={{ background: CHANNEL[source].edge }} />
       <p className="flex items-center justify-between">
-        <Chip tone={direct ? "sage" : "neutral"}>{source}</Chip>
+        <ChannelChip id={source} />
         <span className="text-[11px] tabular-nums text-taupe">{time}</span>
       </p>
       <p className="mt-1 text-[13px] font-semibold">{what}</p>
@@ -124,7 +136,7 @@ function QueueRow({ d, source, time, what, children, direct = false }: { d?: str
 export function ChannelScreen() {
   return (
     <div className="flex h-full flex-col gap-5 p-7">
-      <Head label="Channel manager" title="Rates and availability" right={<Chip tone="sage" className="px-3 py-1.5 text-[12px]">4 channels · all in step</Chip>} />
+      <Head label="Channel manager" title="Rates and availability" right={<Chip tone="sage" className="px-3 py-1.5 text-[12px]">5 channels · all in step</Chip>} />
       <div className="grid min-h-0 flex-1 grid-cols-[1fr_360px] gap-5">
         <div className="flex flex-col gap-5">
           <Card d="ch-editor" className="flex items-center gap-4 p-5">
@@ -141,9 +153,13 @@ export function ChannelScreen() {
             <div className="grid grid-cols-[1.4fr_1fr_1fr_1fr] gap-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.07em] text-taupe">
               <span>Channel</span><span>Rate</span><span>Rooms left</span><span>Status</span>
             </div>
-            {CHANNELS.map((c, i) => (
-              <div key={c} data-d={`ch-row${i}`} className="grid grid-cols-[1.4fr_1fr_1fr_1fr] items-center gap-3 rounded border-t border-line-soft py-3.5">
-                <span className="font-semibold">{c}</span>
+            {CHANNEL_IDS.map((c, i) => (
+              <div key={c} data-d={`ch-row${i}`} className="relative grid grid-cols-[1.4fr_1fr_1fr_1fr] items-center gap-3 rounded border-t border-line-soft py-2.5 pl-3">
+                <span className="absolute bottom-2.5 left-0 top-2.5 w-[3px] rounded-full" style={{ background: CHANNEL[c].edge }} />
+                <span className="flex items-center gap-2.5 font-semibold">
+                  <ChannelLogo id={c} size={22} />
+                  {CHANNEL[c].name}
+                </span>
                 <span data-d={`ch-r${i}`} className="text-[16px] font-semibold tabular-nums">$289</span>
                 <span data-d={`ch-l${i}`} className="tabular-nums">1</span>
                 <Chip tone="sage" className="w-fit"><Check size={11} strokeWidth={3} /> In step</Chip>
@@ -152,28 +168,39 @@ export function ChannelScreen() {
             <div className="mt-4 border-t border-line pt-4">
               <p className="flex justify-between text-[12px] font-semibold">
                 <span data-d="ch-mix" className="text-sage-deep">Direct 38%</span>
-                <span className="text-taupe">Through OTAs</span>
+                <span className="text-taupe">Through OTAs 62%</span>
               </p>
-              <span className="mt-2 flex h-2.5 overflow-hidden rounded-full bg-parchment">
-                <span data-d="ch-mixbar" className="block h-full bg-sage" style={{ width: "38%" }} />
+              <span className="mt-2 flex h-2.5 gap-0.5 overflow-hidden rounded-full">
+                <span data-d="ch-mixbar" className="block h-full flex-none bg-sage" style={{ width: "38%" }} />
+                {MIX.map(([c, share]) => (
+                  <span key={c} className="block h-full" style={{ flexGrow: share, background: c === "agoda" ? "linear-gradient(90deg,#e4312b,#f7941d,#f9c013,#6cb33f,#2b6cb5)" : CHANNEL[c].edge }} />
+                ))}
               </span>
+              <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-taupe">
+                {MIX.map(([c, share]) => (
+                  <span key={c} className="flex items-center gap-1.5">
+                    <ChannelLogo id={c} size={13} />
+                    {share}%
+                  </span>
+                ))}
+              </p>
             </div>
           </Card>
         </div>
         <Card d="ch-queue" className="px-5 pt-5">
           <Label>Bookings, in the order they arrive</Label>
           {QUEUE_OLD.map(([source, time, what, state]) => (
-            <QueueRow key={time} source={source} time={time} what={what} direct={source === "Your website"}>
+            <QueueRow key={time} source={source} time={time} what={what}>
               <Chip tone="sage">{state}</Chip>
             </QueueRow>
           ))}
-          <QueueRow d="ch-q1" source="Expedia" time="18:41:02.114" what="Deluxe king · Sat · last room">
+          <QueueRow d="ch-q1" source="expedia" time="18:41:02.114" what="Deluxe king · Sat · last room">
             <Chip tone="sage" d="ch-q1s" className={HIDDEN}>Confirmed · Room 305</Chip>
           </QueueRow>
-          <QueueRow d="ch-q2" source="Booking.com" time="18:41:02.380" what="Deluxe king · Sat">
+          <QueueRow d="ch-q2" source="booking" time="18:41:02.380" what="Deluxe king · Sat">
             <Chip tone="rust" d="ch-q2s" className={HIDDEN}>Sold out · offered a junior suite</Chip>
           </QueueRow>
-          <QueueRow d="ch-q3" source="Your website" time="18:42:17.902" what="Junior suite · Sat" direct>
+          <QueueRow d="ch-q3" source="direct" time="18:42:17.902" what="Junior suite · Sat">
             <Chip tone="sage">Confirmed · no commission</Chip>
           </QueueRow>
         </Card>
@@ -221,8 +248,8 @@ export function RevenueScreen() {
           </div>
           <div data-d="rv-pushed" className={`mt-auto flex flex-wrap items-center gap-2 rounded-md bg-sage/10 p-3 text-[12px] ${HIDDEN}`}>
             <span className="font-semibold text-sage-deep">New rates sent to</span>
-            {CHANNELS.map((c) => (
-              <Chip key={c} tone="sage"><Check size={11} strokeWidth={3} /> {c}</Chip>
+            {CHANNEL_IDS.map((c) => (
+              <ChannelChip key={c} id={c} />
             ))}
           </div>
         </Card>

@@ -1,5 +1,6 @@
 import { Check, Plus } from "lucide-react";
 import { COMPANY, SOCIALS, asset } from "@/lib/constants";
+import { SocialIcon } from "@/components/brands";
 import { BUTTON_DARK, BUTTON_LIGHT, EYEBROW, H2, SectionHead, SpearMeaning } from "./ui";
 
 /* ---------- Packages ---------- */
@@ -163,8 +164,12 @@ function TccMark({ className = "" }: { className?: string }) {
 
 const FOOTER_LINKS: [string, [string, string][]][] = [
   ["SPEAR OS", [["See it work", "#product"], ["Modules", "#modules"], ["Pricing", "#pricing"], ["FAQ", "#faq"], ["Contact us", "#contact"], ["Client login", "login/"]]],
-  [COMPANY.name, [["Company website", COMPANY.url], ...SOCIALS.map(({ name, url }): [string, string] => [name, url])]],
+  [COMPANY.name, [["Company website", COMPANY.url]]],
 ];
+
+const FOOTER_HEAD = "text-[12px] font-semibold uppercase tracking-[0.14em] text-brass-deep";
+const SOCIAL =
+  "flex h-11 w-11 items-center justify-center rounded-full border border-line text-taupe transition-colors hover:border-brass hover:bg-brass/10 hover:text-espresso";
 
 const FOOTER_LINK = "inline-flex min-h-9 items-center text-[14px] text-taupe transition-colors hover:text-espresso";
 
@@ -187,22 +192,40 @@ export function Footer() {
           <span className="mt-3 text-[14px] font-semibold tracking-[0.02em]">{COMPANY.name}</span>
         </a>
 
-        <nav aria-label="Footer" className="grid grid-cols-2 gap-8 text-left md:justify-self-end">
-          {FOOTER_LINKS.map(([group, links]) => (
-            <div key={group}>
-              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-brass-deep">{group}</p>
-              <ul className="mt-3">
-                {links.map(([label, href]) => (
-                  <li key={label}>
-                    <a href={href.startsWith("http") ? href : href.startsWith("#") ? href : asset(`/${href}`)} className={FOOTER_LINK}>
-                      {label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </nav>
+        <div className="text-left md:justify-self-end">
+          <nav aria-label="Footer" className="grid grid-cols-2 gap-8">
+            {FOOTER_LINKS.map(([group, links]) => (
+              <div key={group}>
+                <p className={FOOTER_HEAD}>{group}</p>
+                <ul className="mt-3">
+                  {links.map(([label, href]) => (
+                    <li key={label}>
+                      <a href={href.startsWith("http") ? href : href.startsWith("#") ? href : asset(`/${href}`)} className={FOOTER_LINK}>
+                        {label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </nav>
+          <p className={`mt-8 ${FOOTER_HEAD}`}>Follow us</p>
+          <ul className="mt-3 flex gap-2">
+            {SOCIALS.map(({ id, name, url }) => (
+              <li key={id}>
+                {url ? (
+                  <a href={url} target="_blank" rel="noopener noreferrer" aria-label={`${COMPANY.name} on ${name}`} className={SOCIAL}>
+                    <SocialIcon id={id} />
+                  </a>
+                ) : (
+                  <span role="img" title={`${name}, coming soon`} aria-label={`${name}, coming soon`} className={SOCIAL}>
+                    <SocialIcon id={id} />
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <p className="mx-auto max-w-[1280px] border-t border-line-soft px-5 py-6 text-center text-[13px] text-taupe md:px-8">

@@ -13,8 +13,14 @@ export const COMPANY = {
   url: "https://thecodeconsortium.com",
 };
 
-// Social accounts shown in the footer. Add { name: "LinkedIn", url: "https://…" } entries as accounts go live.
-export const SOCIALS: { name: string; url: string }[] = [];
+// Social accounts shown in the footer. url: null shows the icon without a link, for accounts not set up yet.
+export const SOCIALS: { id: "linkedin" | "instagram" | "facebook" | "x" | "youtube"; name: string; url: string | null }[] = [
+  { id: "linkedin", name: "LinkedIn", url: "https://www.linkedin.com/company/the-code-consortium" },
+  { id: "instagram", name: "Instagram", url: null },
+  { id: "facebook", name: "Facebook", url: null },
+  { id: "x", name: "X", url: null },
+  { id: "youtube", name: "YouTube", url: null },
+];
 
 // Web3Forms key for the contact form. These keys are meant to be public; they only allow sending to the owner's inbox.
 export const FORM_KEY = "503de41a-ee74-48df-bb31-ba13feab93de";

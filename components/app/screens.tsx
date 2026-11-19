@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { CHANNEL, ChannelChip, ChannelLogo, type ChannelId } from "@/components/brands";
 import { BadgeCheck, BellRing, CalendarPlus, Check, Clock, IdCard, KeyRound, Receipt, RefreshCw, Smartphone, BedDouble, Truck, Wifi, WifiOff } from "lucide-react";
 
 // The SPEAR screens shown on the site, rebuilt from the team's Stitch designs with sample data.
@@ -279,7 +280,8 @@ export function FrontDeskScreen() {
               <Avatar initials={row.initials} tone={row.tag === "VIP" ? "brass" : "neutral"} />
               <div className="min-w-0 flex-1">
                 <p className="flex items-center gap-2 font-semibold">
-                  {row.name} <Chip tone={row.tag === "VIP" ? "brass" : "neutral"}>{row.tag}</Chip>
+                  {row.name}{" "}
+                  {row.tag === "Direct" ? <ChannelChip id="direct" label="Direct" /> : row.tag === "Booking.com" ? <ChannelChip id="booking" /> : <Chip tone={row.tag === "VIP" ? "brass" : "neutral"}>{row.tag}</Chip>}
                 </p>
                 <p className="flex items-center gap-1 text-[13px] text-taupe">
                   {row.room} · <Clock size={12} /> {row.eta}
@@ -767,17 +769,32 @@ export function HousekeepingScreen() {
 
 /* ---------- Hotel PMS: a booking assigned, a charge posted, checkout ---------- */
 
-type PmsRoom = { name: string; type: string; status?: [string, Tone]; stay?: { from: number; nights: number; who: string; look: string } };
+type PmsRoom = { name: string; type: string; status?: [string, Tone]; stay?: { from: number; nights: number; who: string; via: ChannelId } };
 const PMS_ROOMS: PmsRoom[] = [
-  { name: "Room 301", type: "Deluxe king", status: ["Occupied", "neutral"], stay: { from: 0, nights: 4, who: "Hannah Brooks", look: "bg-sage/20 text-sage-deep" } },
-  { name: "Room 302", type: "Deluxe twin", status: ["Clean", "sage"], stay: { from: 2, nights: 3, who: "Kenji Watanabe", look: "bg-parchment text-espresso" } },
-  { name: "Room 303", type: "Deluxe king", status: ["Occupied", "neutral"], stay: { from: 0, nights: 2, who: "Amira Haddad", look: "bg-sage/20 text-sage-deep" } },
-  { name: "Room 304", type: "Junior suite", status: ["Clean", "sage"], stay: { from: 4, nights: 3, who: "Luca Moretti", look: "bg-brass text-espresso" } },
+  { name: "Room 301", type: "Deluxe king", status: ["Occupied", "neutral"], stay: { from: 0, nights: 4, who: "Hannah Brooks", via: "booking" } },
+  { name: "Room 302", type: "Deluxe twin", status: ["Clean", "sage"], stay: { from: 2, nights: 3, who: "Kenji Watanabe", via: "agoda" } },
+  { name: "Room 303", type: "Deluxe king", status: ["Occupied", "neutral"], stay: { from: 0, nights: 2, who: "Amira Haddad", via: "expedia" } },
+  { name: "Room 304", type: "Junior suite", status: ["Clean", "sage"], stay: { from: 4, nights: 3, who: "Luca Moretti", via: "airbnb" } },
   { name: "Room 305", type: "Deluxe king" },
-  { name: "Room 306", type: "Deluxe twin", status: ["Turnover", "rust"], stay: { from: 3, nights: 2, who: "Priya Raman", look: "bg-parchment text-espresso" } },
+  { name: "Room 306", type: "Deluxe twin", status: ["Turnover", "rust"], stay: { from: 3, nights: 2, who: "Priya Raman", via: "direct" } },
 ];
 
 const LANE = "relative h-[58px] flex-1 rounded-md bg-parchment/40";
+
+// A booking on the calendar: who, and which channel it came through.
+function StayText({ who, via, nights }: { who: string; via: ChannelId; nights: number }) {
+  return (
+    <>
+      <span className="flex items-center gap-1.5 truncate text-[12px] font-semibold">
+        <ChannelLogo id={via} size={14} />
+        {who}
+      </span>
+      <span className="truncate text-[11px] opacity-80">
+        {CHANNEL[via].name} · {nights} {nights === 1 ? "night" : "nights"}
+      </span>
+    </>
+  );
+}
 const stayPos = (from: number, nights: number) => ({ left: from * DAY_W + 3, width: nights * DAY_W - 6 });
 
 export function PmsScreen() {
@@ -812,11 +829,10 @@ export function PmsScreen() {
             <div className={LANE}>
               <span
                 data-d="pm-new"
-                className={`absolute top-1 z-10 flex h-[50px] flex-col justify-center overflow-hidden rounded-md border border-dashed border-brass bg-brass/20 px-3 text-espresso ${HIDDEN}`}
-                style={stayPos(1, 3)}
+                className={`absolute top-1 z-10 flex h-[50px] flex-col justify-center overflow-hidden rounded-md border border-dashed pl-4 pr-3 ${HIDDEN}`}
+                style={{ ...stayPos(1, 3), background: CHANNEL.booking.tint, color: CHANNEL.booking.ink, borderColor: CHANNEL.booking.edge }}
               >
-                <span className="truncate text-[12px] font-semibold">Daniel Okafor</span>
-                <span className="truncate text-[11px] opacity-80">Booking.com · 3 nights</span>
+                <StayText who="Daniel Okafor" via="booking" nights={3} />
               </span>
             </div>
           </div>
@@ -838,9 +854,12 @@ export function PmsScreen() {
                 </div>
                 <div className={LANE}>
                   {room.stay ? (
-                    <span className={`absolute top-1 flex h-[50px] flex-col justify-center overflow-hidden rounded-md px-3 ${room.stay.look}`} style={stayPos(room.stay.from, room.stay.nights)}>
-                      <span className="truncate text-[12px] font-semibold">{room.stay.who}</span>
-                      <span className="truncate text-[11px] opacity-80">{room.stay.nights} nights</span>
+                    <span
+                      className="absolute top-1 flex h-[50px] flex-col justify-center overflow-hidden rounded-md pl-4 pr-3"
+                      style={{ ...stayPos(room.stay.from, room.stay.nights), background: CHANNEL[room.stay.via].tint, color: CHANNEL[room.stay.via].ink }}
+                    >
+                      <span className="absolute bottom-0 left-0 top-0 w-[4px]" style={{ background: CHANNEL[room.stay.via].edge }} />
+                      <StayText who={room.stay.who} via={room.stay.via} nights={room.stay.nights} />
                     </span>
                   ) : (
                     <span data-d="pm-slot" className={`absolute top-1 h-[50px] rounded-md border-2 border-dashed border-brass/70 bg-brass/10 ${HIDDEN}`} style={stayPos(1, 3)} />
@@ -865,7 +884,7 @@ export function PmsScreen() {
               <Avatar initials="DO" tone="brass" />
               <div>
                 <p className="flex items-center gap-2 font-semibold">
-                  Daniel Okafor <Chip>Booking.com</Chip>
+                  Daniel Okafor <ChannelChip id="booking" />
                 </p>
                 <p className="text-[12px] text-taupe">Thu 4 – Sun 7 Oct · 2 previous stays</p>
               </div>
@@ -902,7 +921,7 @@ export function PmsScreen() {
           </div>
         </Card>
       </div>
-      <Toast d="pm-toast" icon={<CalendarPlus size={16} />} title="New booking from Booking.com" line="Daniel Okafor · Thu 4 – Sun 7 Oct · deluxe king" />
+      <Toast d="pm-toast" icon={<ChannelLogo id="booking" size={20} />} title="New booking from Booking.com" line="Daniel Okafor · Thu 4 – Sun 7 Oct · deluxe king" />
       <Toast d="pm-toast2" icon={<BedDouble size={16} />} title="Room 305 sent to housekeeping" line="It can't be checked in again until it's cleared" />
     </div>
   );

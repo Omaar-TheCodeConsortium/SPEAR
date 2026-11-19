@@ -256,7 +256,7 @@ export function pmsDemo(k: DemoKit) {
   a.show("pm-slot", "<0.5", { scale: 0.96 });
   a.drag("pm-new", "pm-slot");
   a.hide("pm-slot", "<");
-  tl.to(a.q("pm-new"), { backgroundColor: "rgba(78,115,86,0.2)", borderColor: "rgba(78,115,86,0.5)", borderStyle: "solid", duration: 0.4 }, "<");
+  tl.to(a.q("pm-new"), { borderStyle: "solid", boxShadow: "inset 4px 0 0 #003a9a", duration: 0.4 }, "<");
   a.hide("pm-st-clean", "<");
   a.show("pm-st-occ", "<", { y: 4 });
   a.swap("pm-assign", "All assigned", "<");
@@ -360,7 +360,7 @@ export function bookingDemo(k: DemoKit) {
   a.swap("bk-left", "1");
   a.flash("bk-avail", "<");
   a.swap("bk-site-left", "1 left", "<");
-  ["bk-c0", "bk-c1", "bk-c2", "bk-c3"].forEach((n, i) => a.swap(n, "1 left", i ? "<0.15" : "+=0.2"));
+  ["bk-c0", "bk-c1", "bk-c2", "bk-c3", "bk-c4"].forEach((n, i) => a.swap(n, "1 left", i ? "<0.15" : "+=0.2"));
   a.leave(160, 40);
   tl.call(step, [3]);
 }
@@ -376,7 +376,7 @@ export function channelDemo(k: DemoKit) {
   a.move("ch-update", 0.5, 0.5, 0.7);
   a.click();
   tl.addLabel("spread");
-  [0, 1, 2, 3].forEach((i) => {
+  [0, 1, 2, 3, 4].forEach((i) => {
     a.swap(`ch-r${i}`, "$309", i ? "<0.18" : "+=0.15");
     a.flash(`ch-row${i}`, "<");
   });
@@ -387,7 +387,7 @@ export function channelDemo(k: DemoKit) {
   a.show("ch-q2", "<0.25", { x: 24 });
   a.show("ch-q1s", "+=0.5", { scale: 0.9 });
   a.show("ch-q2s", "+=0.35", { scale: 0.9 });
-  [0, 1, 2, 3].forEach((i) => a.swap(`ch-l${i}`, "0", i ? "<0.1" : "<"));
+  [0, 1, 2, 3, 4].forEach((i) => a.swap(`ch-l${i}`, "0", i ? "<0.1" : "<"));
   tl.call(step, [2], "+=0.8");
   tl.addLabel("direct");
   a.show("ch-q3", undefined, { x: 24 });
@@ -840,7 +840,7 @@ FILMS.booking = {
 FILMS.channel = {
   start: { d: "ch-editor", w: 470, ax: 0.78, ay: 1.4 },
   cues: [
-    ["spread", { x: 92, y: 150, w: 520 }],
+    ["spread", { x: 66, y: 150, w: 540 }],
     ["queue-=0.6", { d: "ch-queue", w: 430, ay: 0.55 }],
     ["direct+=0.6", { d: "ch-queue", w: 430, ay: 0.7 }],
   ],
