@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type ComponentType } from "react";
-import { RotateCcw } from "lucide-react";
+import { ArrowDown, RotateCcw } from "lucide-react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import Stage, { Cursor } from "@/components/app/Stage";
 import AppShell, { RAIL, RAIL_STEP, type RailKey } from "@/components/app/AppShell";
@@ -111,14 +111,18 @@ export default function Showcase() {
       };
 
       // Builds and plays one demo inside its own context so it can be undone completely.
-      const run = (area: Area, canvas: HTMLElement, cursor: HTMLElement, step: (i: number) => void, reduce: boolean) => {
+      const run = (area: Area, canvas: HTMLElement, cursor: HTMLElement, step: (i: number) => void, reduce: boolean, onDone?: () => void) => {
         step(-1);
         const ctx = gsap.context(() => {
           const tl = buildDemo(area.demo, FILMS[area.rail], { canvas, cursor, step, reduce });
           if (reduce) {
             tl.progress(1);
             gsap.set(cursor, { autoAlpha: 0 });
-          } else tl.play();
+            onDone?.();
+          } else {
+            if (onDone) tl.eventCallback("onComplete", onDone);
+            tl.play();
+          }
         }, canvas);
         return () => {
           ctx.revert();
@@ -140,6 +144,11 @@ export default function Showcase() {
           const captions = gsap.utils.toArray<HTMLElement>("[data-area]", pin);
           const indicator = canvas.querySelector<HTMLElement>("[data-rail-indicator]")!;
           const progress = pin.querySelector<HTMLElement>("[data-progress]");
+          // The prompt at the foot of the window: which area this is, and a button to the next one.
+          const cue = pin.querySelector<HTMLElement>("[data-cue]")!;
+          const cueCount = cue.querySelector<HTMLElement>("[data-cue-count]")!;
+          const cueLabel = cue.querySelector<HTMLElement>("[data-cue-label]")!;
+          const segments = gsap.utils.toArray<HTMLElement>("[data-seg]", cue);
           let current = -1;
           let undo: (() => void) | null = null;
 
@@ -156,7 +165,11 @@ export default function Showcase() {
               gsap.fromTo(screens[index], { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.55, delay: previous >= 0 ? 0.2 : 0, ease: "power3.out", overwrite: true });
               gsap.to(indicator, { y: railIndex * RAIL_STEP, duration: 0.6, ease: "power3.inOut" });
             }
-            undo = run(AREAS[index], canvas, cursor, stepper(captions[index]), reduce);
+            cue.classList.remove("is-waiting");
+            cueCount.textContent = `${index + 1} of ${AREAS.length}`;
+            cueLabel.textContent = index < AREAS.length - 1 ? `Scroll for ${AREAS[index + 1].title}` : "Scroll on to continue";
+            // Once the demo has played, the prompt pulses so nobody mistakes the pause for the end of the page.
+            undo = run(AREAS[index], canvas, cursor, stepper(captions[index]), reduce, () => cue.classList.add("is-waiting"));
           };
 
           const trigger = ScrollTrigger.create({
@@ -167,18 +180,27 @@ export default function Showcase() {
             onUpdate: (self) => {
               activate(Math.min(AREAS.length - 1, Math.floor(self.progress * AREAS.length)));
               if (progress) gsap.set(progress, { scaleY: self.progress });
+              // Finished areas fill their bar; the current one fills as you scroll through it.
+              segments.forEach((seg, k) => gsap.set(seg, { scaleX: gsap.utils.clamp(k === current ? 0.15 : 0, 1, self.progress * AREAS.length - k) }));
             },
             onToggle: (self) => {
               if (self.isActive && current < 0) activate(0);
             },
           });
 
-          // Clicking an area's title scrolls to it.
+          // Clicking an area's title scrolls to it; the prompt's button scrolls to the next one, or past the last.
+          const scrollToArea = (k: number) => {
+            const span = trigger.end - trigger.start;
+            const top = k >= AREAS.length ? trigger.end + window.innerHeight - 64 : trigger.start + (span * (k + 0.5)) / AREAS.length;
+            window.scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
+          };
+          const next = () => scrollToArea(current + 1);
+          const nextButton = cue.querySelector("[data-next]")!;
+          nextButton.addEventListener("click", next);
+          replayHandlers.push(() => nextButton.removeEventListener("click", next));
+
           captions.forEach((caption, k) => {
-            const go = () => {
-              const span = trigger.end - trigger.start;
-              window.scrollTo({ top: trigger.start + (span * (k + 0.5)) / AREAS.length, behavior: reduce ? "auto" : "smooth" });
-            };
+            const go = () => scrollToArea(k);
             const button = caption.querySelector("[data-goto]")!;
             button.addEventListener("click", go);
             replayHandlers.push(() => button.removeEventListener("click", go));
@@ -233,7 +255,7 @@ export default function Showcase() {
       />
 
       {/* Desktop: captions on the left, one app window that changes as you scroll */}
-      <div data-pin="" className="hidden h-screen lg:block">
+      <div data-pin="" className="relative hidden h-screen lg:block">
         <div className="mx-auto grid h-full max-w-[1440px] grid-cols-[minmax(0,4fr)_minmax(0,8fr)] items-center gap-12 px-10 xl:gap-16">
           <div className="relative pl-6">
             <span aria-hidden="true" className="absolute bottom-0 left-0 top-0 w-px bg-line" />
@@ -268,6 +290,23 @@ export default function Showcase() {
               <Cursor />
             </Stage>
           </div>
+        </div>
+
+        <div data-cue="" className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-4 rounded-full border border-line bg-cream/95 py-1.5 pl-5 pr-1.5 shadow-[0_12px_30px_-12px_rgba(34,27,22,0.35)] backdrop-blur">
+          <span aria-hidden="true" className="flex items-center gap-1.5">
+            {AREAS.map((area) => (
+              <span key={area.rail} className="h-1.5 w-7 overflow-hidden rounded-full bg-brass/20">
+                <span data-seg="" className="block h-full origin-left scale-x-0 rounded-full bg-brass-deep" />
+              </span>
+            ))}
+          </span>
+          <span data-cue-count="" className="min-w-[3.6em] text-[13px] font-semibold tabular-nums text-taupe">
+            1 of {AREAS.length}
+          </span>
+          <button type="button" data-next="" className="cue-next inline-flex min-h-11 items-center gap-2 rounded-full bg-espresso px-5 text-[14px] font-semibold text-linen transition-colors hover:bg-brass-deep active:scale-[0.97]">
+            <span data-cue-label="">Scroll for {AREAS[1].title}</span>
+            <ArrowDown size={16} aria-hidden="true" className="cue-arrow" />
+          </button>
         </div>
       </div>
 

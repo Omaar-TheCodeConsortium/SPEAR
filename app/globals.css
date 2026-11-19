@@ -54,6 +54,13 @@ body {
   visibility: hidden;
 }
 
+/* Showcase prompt: the arrow keeps bobbing, and the button pulses once a demo has finished. */
+.cue-arrow { animation: cue-bob 1.5s ease-in-out infinite; }
+[data-cue].is-waiting .cue-next { animation: cue-pulse 1.6s ease-out infinite; }
+@keyframes cue-bob { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
+@keyframes cue-pulse { 0% { box-shadow: 0 0 0 0 rgb(199 154 69 / 0.6); } 100% { box-shadow: 0 0 0 16px rgb(199 154 69 / 0); } }
+@media (prefers-reduced-motion: reduce) { .cue-arrow, [data-cue].is-waiting .cue-next { animation: none; } }
+
 /* Showcase captions: the active area opens, the others stay as titles. */
 .area-title { color: rgb(34 27 22 / 0.38); transition: color 0.4s var(--ease-out-quint); }
 .area.is-active .area-title,

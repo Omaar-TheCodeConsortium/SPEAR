@@ -4,7 +4,7 @@ import Hero from "@/components/home/Hero";
 import Showcase from "@/components/home/Showcase";
 import Journey from "@/components/home/Journey";
 import Reliability from "@/components/home/Reliability";
-import DemoForm from "@/components/home/DemoForm";
+import ContactForm from "@/components/home/ContactForm";
 import Motion from "@/components/home/Motion";
 import { FAQS, Faq, Footer, Owned, Packages } from "@/components/home/Content";
 import Explorer from "@/components/home/Explorer";
@@ -44,7 +44,7 @@ export default function HomePage() {
         <Packages />
         <Owned />
         <Faq />
-        <DemoForm />
+        <ContactForm />
       </main>
       <Footer />
       <Motion />

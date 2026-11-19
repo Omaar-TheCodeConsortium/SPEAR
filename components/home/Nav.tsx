@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import Link from "next/link";
+import { LogIn, Menu, X } from "lucide-react";
 import { asset } from "@/lib/constants";
 
 const LINKS = [
@@ -52,11 +53,17 @@ export default function Nav() {
           ))}
         </ul>
         <div className="flex items-center gap-2">
+          <Link
+            href="/login/"
+            className="hidden min-h-11 items-center gap-2 rounded-lg border border-brass/50 px-4 text-[14px] font-semibold text-espresso transition-colors hover:border-brass hover:bg-brass/10 sm:inline-flex"
+          >
+            <LogIn size={16} aria-hidden="true" /> Client login
+          </Link>
           <a
-            href="#demo"
+            href="#contact"
             className="inline-flex min-h-11 items-center rounded-lg bg-espresso px-5 text-[14px] font-semibold text-linen transition-colors hover:bg-brass-deep"
           >
-            Book a demo
+            Contact us
           </a>
           <button
             type="button"
@@ -79,6 +86,11 @@ export default function Nav() {
               </a>
             </li>
           ))}
+          <li className="sm:hidden">
+            <Link href="/login/" className="flex min-h-12 items-center gap-2 text-[17px] font-semibold text-brass-deep">
+              <LogIn size={18} aria-hidden="true" /> Client login
+            </Link>
+          </li>
         </ul>
       ) : null}
     </header>

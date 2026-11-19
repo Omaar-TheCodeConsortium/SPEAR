@@ -75,8 +75,8 @@ export default function Hero() {
           SPEAR OS runs your front desk, restaurant, kitchen and housekeeping as one product, and keeps working when the internet doesn&apos;t.
         </p>
         <p data-intro="" className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-          <a href="#demo" className={BUTTON_DARK}>
-            Book a demo
+          <a href="#contact" className={BUTTON_DARK}>
+            Contact us
           </a>
           <a href="#product" className={BUTTON_LIGHT}>
             See it work

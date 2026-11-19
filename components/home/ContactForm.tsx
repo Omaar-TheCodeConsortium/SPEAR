@@ -7,7 +7,7 @@ import { BUTTON_DARK, EYEBROW, H2 } from "./ui";
 const FIELD =
   "mt-2 block min-h-12 w-full rounded-lg border border-brass/35 bg-cream px-4 text-[16px] text-espresso placeholder:text-taupe/60 focus:border-brass focus:outline-none focus:ring-2 focus:ring-brass/25";
 
-export default function DemoForm() {
+export default function ContactForm() {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -18,7 +18,7 @@ export default function DemoForm() {
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ access_key: FORM_KEY, subject: "SPEAR OS demo request", from_name: "spear-os.com", ...data }),
+        body: JSON.stringify({ access_key: FORM_KEY, subject: "SPEAR OS enquiry", from_name: "spear-os.com", ...data }),
       });
       setState(response.ok ? "sent" : "error");
     } catch {
@@ -27,15 +27,15 @@ export default function DemoForm() {
   }
 
   return (
-    <section id="demo" aria-labelledby="demo-title" className="mx-auto mt-24 max-w-6xl scroll-mt-20 px-5 md:mt-32 md:px-8">
+    <section id="contact" aria-labelledby="contact-title" className="mx-auto mt-24 max-w-6xl scroll-mt-20 px-5 md:mt-32 md:px-8">
       <div className="grid gap-10 rounded-2xl border border-line bg-cream p-7 md:grid-cols-[1fr_1.2fr] md:p-12">
         <div data-reveal="">
-          <p className={EYEBROW}>Book a demo</p>
-          <h2 id="demo-title" className={`mt-4 ${H2}`}>
-            See SPEAR with your property in mind.
+          <p className={EYEBROW}>Contact us</p>
+          <h2 id="contact-title" className={`mt-4 ${H2}`}>
+            Tell us about your property.
           </h2>
           <p className="mt-5 text-[17px] leading-relaxed text-taupe">
-            A 30-minute walkthrough of the parts you&apos;d use, set up with rooms, tables and menus like yours.
+            Ask about pricing, the modules you&apos;d need or moving over from your current system. We reply within one working day.
           </p>
         </div>
         {state === "sent" ? (
@@ -68,12 +68,12 @@ export default function DemoForm() {
               </select>
             </label>
             <label className="text-[14px] font-semibold sm:col-span-2">
-              Anything we should know? <span className="font-normal text-taupe">(optional)</span>
+              How can we help? <span className="font-normal text-taupe">(optional)</span>
               <textarea name="message" rows={3} className={`${FIELD} py-3`} />
             </label>
             <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center">
               <button type="submit" disabled={state === "sending"} className={`${BUTTON_DARK} disabled:opacity-60`}>
-                {state === "sending" ? "Sending…" : "Book my demo"}
+                {state === "sending" ? "Sending…" : "Send message"}
               </button>
               {state === "error" ? (
                 <p role="alert" className="text-[14px] text-alert">

@@ -13,5 +13,8 @@ export const COMPANY = {
   url: "https://thecodeconsortium.com",
 };
 
-// Web3Forms key for the demo form. These keys are meant to be public; they only allow sending to the owner's inbox.
+// Social accounts shown in the footer. Add { name: "LinkedIn", url: "https://…" } entries as accounts go live.
+export const SOCIALS: { name: string; url: string }[] = [];
+
+// Web3Forms key for the contact form. These keys are meant to be public; they only allow sending to the owner's inbox.
 export const FORM_KEY = "503de41a-ee74-48df-bb31-ba13feab93de";

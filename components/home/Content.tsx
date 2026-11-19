@@ -1,5 +1,5 @@
 import { Check, Plus } from "lucide-react";
-import { COMPANY, asset } from "@/lib/constants";
+import { COMPANY, SOCIALS, asset } from "@/lib/constants";
 import { BUTTON_DARK, BUTTON_LIGHT, EYEBROW, H2, SectionHead, SpearMeaning } from "./ui";
 
 /* ---------- Packages ---------- */
@@ -58,8 +58,8 @@ export function Packages() {
                 </li>
               ) : null}
             </ul>
-            <a href="#demo" className={`mt-8 ${p.featured ? "inline-flex min-h-12 items-center justify-center rounded-lg bg-brass px-6 text-[15px] font-semibold text-espresso transition-colors hover:bg-linen" : BUTTON_LIGHT}`}>
-              Book a demo
+            <a href="#contact" className={`mt-8 ${p.featured ? "inline-flex min-h-12 items-center justify-center rounded-lg bg-brass px-6 text-[15px] font-semibold text-espresso transition-colors hover:bg-linen" : BUTTON_LIGHT}`}>
+              Contact us
             </a>
           </div>
         ))}
@@ -150,33 +150,68 @@ export function Faq() {
 
 /* ---------- Footer ---------- */
 
+// The Code Consortium's mark, drawn through a mask so it takes the page's colours.
+function TccMark({ className = "" }: { className?: string }) {
+  const url = `url(${asset("/brand/tcc-mark.webp")})`;
+  return (
+    <span
+      className={`block aspect-[1217/408] bg-espresso ${className}`}
+      style={{ maskImage: url, WebkitMaskImage: url, maskSize: "contain", WebkitMaskSize: "contain", maskRepeat: "no-repeat", WebkitMaskRepeat: "no-repeat", maskPosition: "center", WebkitMaskPosition: "center" }}
+    />
+  );
+}
+
+const FOOTER_LINKS: [string, [string, string][]][] = [
+  ["SPEAR OS", [["See it work", "#product"], ["Modules", "#modules"], ["Pricing", "#pricing"], ["FAQ", "#faq"], ["Contact us", "#contact"], ["Client login", "login/"]]],
+  [COMPANY.name, [["Company website", COMPANY.url], ...SOCIALS.map(({ name, url }): [string, string] => [name, url])]],
+];
+
+const FOOTER_LINK = "inline-flex min-h-9 items-center text-[14px] text-taupe transition-colors hover:text-espresso";
+
 export function Footer() {
   return (
-    <footer className="mt-24 border-t border-line md:mt-32">
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-5 py-14 md:flex-row md:items-end md:justify-between md:px-8">
+    <footer className="relative mt-24 overflow-hidden border-t border-line md:mt-32">
+      <div className="mx-auto grid max-w-[1280px] items-start gap-14 px-5 pb-10 pt-16 text-center md:grid-cols-[1fr_auto_1fr] md:gap-10 md:px-8 md:text-left">
         <div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={asset("/brand/wordmark.webp")} alt="SPEAR" width={1280} height={143} className="h-auto w-56" loading="lazy" />
-          <p className="mt-4 max-w-sm text-[15px] text-taupe">
-            <SpearMeaning className="block text-[12px] tracking-[0.12em]" />
-            <span className="mt-2 block">
-              A product of{" "}
-              <a href={COMPANY.url} className="font-semibold text-espresso underline decoration-brass underline-offset-4">
-                {COMPANY.name}
-              </a>
-              .
-            </span>
+          <img src={asset("/brand/wordmark.webp")} alt="SPEAR" width={1280} height={143} className="mx-auto h-auto w-52 md:mx-0" loading="lazy" />
+          <p className="mx-auto mt-4 max-w-xs md:mx-0">
+            <SpearMeaning className="block text-[11px] leading-relaxed tracking-[0.12em]" />
           </p>
+          <p className="mx-auto mt-3 max-w-xs text-[15px] text-taupe md:mx-0">Hotel and restaurant software in one system.</p>
         </div>
-        <div className="flex flex-col gap-4 text-[14px] text-taupe md:items-end">
-          <p className="flex flex-wrap gap-x-6 gap-y-2">
-            <a href="#product" className="hover:text-espresso">See it work</a>
-            <a href="#pricing" className="hover:text-espresso">Pricing</a>
-            <a href="#faq" className="hover:text-espresso">FAQ</a>
-            <a href="#demo" className="hover:text-espresso">Book a demo</a>
-          </p>
-          <p>© 2026 {COMPANY.name}</p>
-        </div>
+
+        <a href={COMPANY.url} className="group mx-auto flex flex-col items-center md:pt-1" aria-label={`A product of ${COMPANY.name}`}>
+          <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-taupe">A product of</span>
+          <TccMark className="mt-4 h-12 transition-colors duration-300 group-hover:bg-brass-deep" />
+          <span className="mt-3 text-[14px] font-semibold tracking-[0.02em]">{COMPANY.name}</span>
+        </a>
+
+        <nav aria-label="Footer" className="grid grid-cols-2 gap-8 text-left md:justify-self-end">
+          {FOOTER_LINKS.map(([group, links]) => (
+            <div key={group}>
+              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-brass-deep">{group}</p>
+              <ul className="mt-3">
+                {links.map(([label, href]) => (
+                  <li key={label}>
+                    <a href={href.startsWith("http") ? href : href.startsWith("#") ? href : asset(`/${href}`)} className={FOOTER_LINK}>
+                      {label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+      </div>
+
+      <p className="mx-auto max-w-[1280px] border-t border-line-soft px-5 py-6 text-center text-[13px] text-taupe md:px-8">
+        © 2026 {COMPANY.name}. All rights reserved.
+      </p>
+
+      {/* The parent company's mark as a watermark, cut off by the bottom of the page */}
+      <div aria-hidden="true" className="pointer-events-none mx-auto aspect-[1217/220] w-[min(92vw,1040px)] select-none overflow-hidden opacity-[0.06]">
+        <TccMark />
       </div>
     </footer>
   );
