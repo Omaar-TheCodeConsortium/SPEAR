@@ -696,22 +696,31 @@ export function websiteDemo(k: DemoKit) {
   const { tl, step } = k;
   const a = kit(k);
   tl.call(step, [0]);
-  a.flash("ws-domain", "+=0.6");
+  a.flash("ws-domain", "+=0.5");
   tl.call(step, [1], "+=1");
-  tl.addLabel("photo");
-  a.enter(330, 660);
-  a.move("ws-replace");
+  tl.addLabel("plan");
+  a.flash("ws-sp-plan");
+  a.enter(380, 660, "<0.4");
+  a.move("ws-dine", 0.45, 0.5);
   a.click();
-  tl.fromTo(a.q("ws-hero2"), { autoAlpha: 0 }, { autoAlpha: 1, duration: 1, ease: "power2.inOut" }, "+=0.2");
-  a.toast("ws-toast", "<0.5");
-  tl.call(step, [2], "+=0.9");
-  tl.addLabel("table");
-  a.hide("ws-toast");
-  a.move("ws-table", 0.5, 0.5, 1);
+  tl.addLabel("scroll");
+  tl.to(a.q("ws-page"), { top: "-100%", duration: 1.1, ease: "power3.inOut" }, "+=0.1");
+  a.flash("ws-plan", "+=0.1");
+  tl.addLabel("pick");
+  a.move("ws-t5", 0.5, 0.5, 0.8);
   a.click();
-  a.show("ws-booked", "<0.1", { scale: 0.96 });
-  a.flash("ws-tablebox", "<");
-  a.leave(120, 60);
+  a.show("ws-t5", "<0.05", { scale: 0.8 });
+  a.show("ws-pick", "<0.2", { y: 6 });
+  a.show("ws-reserve", "<", { y: 0 });
+  a.move("ws-reserve", 0.5, 0.5, 0.75);
+  a.click();
+  tl.call(step, [2]);
+  tl.addLabel("booked");
+  a.show("ws-confirm", "<0.05", { scale: 0.96 });
+  a.show("ws-sp-t5", "+=0.5", { scale: 0.6 });
+  a.show("ws-sp-new", "<0.15", { x: 16 });
+  a.flash("ws-spear", "<");
+  a.leave(-160, 60);
   tl.call(step, [3]);
 }
 
@@ -926,12 +935,15 @@ FILMS.staff = {
     ["task-=0.5", { d: "st-tasks", w: 420, ay: 0.6 }],
   ],
 };
+// The table booking sits on the page after it scrolls, so its shot is fixed rather than measured.
+const WEBSITE_PLAN: Shot = { x: 330, y: 150, w: 540 };
 FILMS.website = {
-  start: { x: 690, y: 30, w: 500 },
+  start: { d: "ws-hero", w: 640, ax: 0.5, ay: 0.45 },
   cues: [
-    ["photo-=0.7", { d: "ws-slots", w: 440, ax: 0.7, ay: 0.35 }],
-    ["photo+=1.6", { d: "ws-site", w: 580, ax: 0.32, ay: 0.5 }],
-    ["table-=0.4", { d: "ws-tablebox", w: 440, ay: 0.3 }],
+    ["plan-=0.2", { d: "ws-spear", w: 420, ay: 0.3 }],
+    ["scroll-=0.5", { d: "ws-hero", w: 640, ax: 0.5, ay: 0.6 }],
+    ["pick-=0.4", WEBSITE_PLAN],
+    ["booked+=0.6", { d: "ws-spear", w: 420, ay: 0.3 }],
   ],
 };
 

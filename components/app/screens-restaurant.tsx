@@ -179,8 +179,8 @@ export function MenusScreen() {
 
 /* ---------- Reservations and floor plan ---------- */
 
-type FloorTable = { id: string; x: number; y: number; w: number; h: number; round?: boolean; state: string; tone: Tone; d?: string };
-const FLOOR: FloorTable[] = [
+export type FloorTable = { id: string; x: number; y: number; w: number; h: number; round?: boolean; state: string; tone: Tone; d?: string };
+export const FLOOR: FloorTable[] = [
   { id: "T-01", x: 30, y: 30, w: 92, h: 92, round: true, state: "Seated", tone: "brass" },
   { id: "T-02", x: 160, y: 30, w: 92, h: 92, round: true, state: "Free", tone: "neutral" },
   { id: "T-03", x: 290, y: 30, w: 92, h: 92, round: true, state: "Seated", tone: "brass" },

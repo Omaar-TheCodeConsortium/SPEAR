@@ -1,9 +1,10 @@
-import { Check, Clock, Fingerprint, Globe, ImageIcon, Lock, Mail, Nfc, Plus, QrCode, ShieldCheck, Smartphone, UserCheck, Wifi, X } from "lucide-react";
-import { Avatar, Btn, Card, Chip, Head, HIDDEN, Label, Toast } from "./screens";
+import { ArrowRight, Check, Fingerprint, Globe, Lock, Mail, Nfc, Plus, QrCode, RefreshCw, ShieldCheck, UserCheck, Wifi, X } from "lucide-react";
+import { asset } from "@/lib/constants";
+import { FLOOR } from "./screens-restaurant";
+import { Avatar, Btn, Card, Chip, Head, HIDDEN, Label } from "./screens";
 
 // Guests, property and staff screens for the module explorer. Same rules as screens.tsx.
 
-const OK = "absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-sage text-[13px] font-semibold text-white";
 
 /* ---------- Guest messaging ---------- */
 
@@ -260,57 +261,172 @@ export function StaffScreen() {
 
 /* ---------- Hotel website ---------- */
 
-const SLOTS = ["Front page", "Rooms gallery", "Restaurant", "Spa"];
+// The hotel's own site, as a guest sees it. Its table booking uses the floor plan drawn in SPEAR,
+// shown alongside so the two can be compared.
+
+const SERIF = { fontFamily: "Georgia, 'Times New Roman', serif" };
+const PHOTO = (name: string) => asset(`/demo/${name}.webp`);
+
+// Tables already taken at 19:30, and the extra round table added on the floor plan.
+const TAKEN = new Set(["T-01", "T-02", "T-03", "T-06", "T-10", "T-12"]);
+const PLAN = [...FLOOR, { id: "T-14", x: 420, y: 30, w: 92, h: 92, round: true }];
+
+function SitePlan({ scale, d, site }: { scale: number; d: string; site: boolean }) {
+  return (
+    <div className="relative" style={{ width: 560 * scale, height: 400 * scale }}>
+      {PLAN.map((t) => {
+        const taken = TAKEN.has(t.id);
+        const mine = t.id === "T-05";
+        return (
+          <div
+            key={t.id}
+            className={`absolute flex items-center justify-center border font-semibold ${t.round ? "rounded-full" : "rounded-md"} ${
+              taken ? "border-transparent bg-[#e7dfd0] text-[#a39684]" : site ? "border-[#4e7356] bg-white text-[#2f3e34]" : "border-line bg-cream text-espresso"
+            }`}
+            style={{ left: t.x * scale, top: t.y * scale, width: t.w * scale, height: t.h * scale, fontSize: site ? 11 : 9 }}
+          >
+            {t.id.replace("T-0", "").replace("T-", "")}
+            {mine ? (
+              <span data-d={d} className={`absolute inset-[-1px] flex flex-col items-center justify-center rounded-md bg-brass text-espresso ${HIDDEN}`}>
+                <Check size={site ? 14 : 10} strokeWidth={3} />
+                {site ? <span className="text-[10px] font-semibold">Yours</span> : <span className="text-[8px] font-semibold">Aris</span>}
+              </span>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export function WebsiteScreen() {
   return (
     <div className="flex h-full flex-col gap-5 p-7">
-      <Head label="Hotel website" title="Your website" right={<Chip tone="sage" d="ws-domain" className="px-3 py-1.5 text-[12px]"><Lock size={12} /> Your domain · secure</Chip>} />
-      <div className="grid min-h-0 flex-1 grid-cols-[280px_1fr] gap-5">
-        <Card d="ws-slots" className="p-5">
-          <Label>Photos, by slot</Label>
-          {SLOTS.map((slot, i) => (
-            <div key={slot} className="mt-2 flex items-center gap-3 rounded-md border border-line-soft p-2">
-              <span className={`h-11 w-14 flex-none rounded ${i === 0 ? "bg-[linear-gradient(180deg,#9fb3ad_0%,#9fb3ad_55%,#c7b48f_55%)]" : "bg-[linear-gradient(135deg,#ede5d4,#c79a45)] opacity-70"}`} />
-              <span className="flex-1 text-[13px] font-semibold">{slot}</span>
-              {i === 0 ? <Btn d="ws-replace" className="h-8 px-3 text-[12px]"><ImageIcon size={13} /> Replace</Btn> : null}
-            </div>
-          ))}
-          <p className="mt-4 flex items-center gap-2 text-[12px] text-taupe"><Smartphone size={14} /> Sized for every screen automatically</p>
-        </Card>
+      <Head label="Hotel website" title="Your website" right={<Chip tone="sage" className="px-3 py-1.5 text-[12px]"><Globe size={12} /> Live · built from SPEAR</Chip>} />
+      <div className="grid min-h-0 flex-1 grid-cols-[1fr_262px] gap-5">
+        {/* The browser */}
         <Card className="flex flex-col overflow-hidden">
-          <div className="flex items-center gap-2 border-b border-line bg-parchment/60 px-4 py-2.5">
+          <div className="flex items-center gap-2 border-b border-line bg-parchment/60 px-4 py-2">
             <span className="h-2.5 w-2.5 rounded-full bg-line" />
             <span className="h-2.5 w-2.5 rounded-full bg-line" />
             <span className="h-2.5 w-2.5 rounded-full bg-line" />
-            <span className="ml-3 flex items-center gap-2 rounded-full bg-linen px-3 py-1 text-[12px] text-taupe"><Lock size={11} className="text-sage-deep" /> your-hotel.com</span>
+            <span data-d="ws-domain" className="ml-3 flex items-center gap-2 rounded-full bg-linen px-3 py-1 text-[12px] text-espresso">
+              <Lock size={11} className="text-sage-deep" /> grandazure.com
+            </span>
           </div>
-          <div data-d="ws-site" className="relative flex-1">
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,#9fb3ad_0%,#b9c6bf_58%,#c7b48f_58%,#d8c9a8_100%)]" />
-            <div data-d="ws-hero2" className={`absolute inset-0 bg-[linear-gradient(180deg,#d9a46b_0%,#e8c290_52%,#7f8f86_52%,#5f6f67_100%)] ${HIDDEN}`} />
-            <div className="absolute left-8 top-8 text-espresso">
-              <p className="text-[12px] font-bold uppercase tracking-[0.16em]">The Grand Azure</p>
-              <p className="mt-1 text-[34px] font-semibold leading-tight">A quiet stay by the sea</p>
+          <div className="relative flex-1 overflow-hidden bg-white" style={SERIF}>
+            {/* The site's own navigation stays put while the page scrolls under it */}
+            <div className="absolute inset-x-0 top-0 z-20 flex h-12 items-center justify-between bg-white/95 px-6 shadow-[0_1px_0_rgba(0,0,0,0.06)]">
+              <span className="text-[15px] tracking-[0.22em] text-[#1d2b33]">THE GRAND AZURE</span>
+              <span className="flex items-center gap-5 font-sans text-[11px] font-semibold uppercase tracking-[0.12em] text-[#4a5a62]">
+                <span>Stay</span>
+                <span>Dine</span>
+                <span>Spa</span>
+                <span>Offers</span>
+                <span className="rounded-full bg-[#1d2b33] px-3.5 py-1.5 text-white">Book now</span>
+              </span>
             </div>
-            <div className="absolute inset-x-8 bottom-8 grid grid-cols-2 gap-4">
-              <div className="rounded-lg bg-cream/95 p-4 shadow-[0_10px_30px_-10px_rgba(34,27,22,0.4)]">
-                <Label>Book a room</Label>
-                <p className="mt-1 text-[13px] font-semibold">Thu 4 – Sun 7 Oct · 2 adults</p>
-                <Btn tone="dark" className="mt-3 w-full">See rooms</Btn>
-              </div>
-              <div data-d="ws-tablebox" className="relative rounded-lg bg-cream/95 p-4 shadow-[0_10px_30px_-10px_rgba(34,27,22,0.4)]">
-                <Label>Book a table</Label>
-                <p className="mt-1 text-[13px] font-semibold">Tonight · 2 guests</p>
-                <span className="relative mt-3 block">
-                  <Btn tone="brass" d="ws-table" className="w-full"><Clock size={14} /> 19:30</Btn>
-                  <span data-d="ws-booked" className={`${OK} text-[12px] ${HIDDEN}`}><Check size={14} strokeWidth={3} /> Table booked</span>
-                </span>
-              </div>
+
+            <div data-d="ws-page" className="absolute inset-x-0 top-0 h-[200%]">
+              {/* Hero, with the room search a real hotel site leads with */}
+              <section data-d="ws-hero" className="relative h-1/2 pt-12">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={PHOTO("site-hero")} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,20,26,0.05)_30%,rgba(10,20,26,0.55)_100%)]" />
+                <div className="absolute inset-x-7 bottom-[104px] text-white">
+                  <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-white/85">Beachfront resort &amp; bistro</p>
+                  <p className="mt-2 text-[40px] leading-[1.05]">A quiet stay by the sea</p>
+                  <span data-d="ws-dine" className="mt-3 inline-flex items-center gap-1.5 border-b border-white/70 pb-0.5 font-sans text-[12px] font-semibold">
+                    Reserve a table at Azure Bistro <ArrowRight size={13} />
+                  </span>
+                </div>
+                <div className="absolute inset-x-7 bottom-6 grid grid-cols-[1fr_1fr_1fr_auto] items-center gap-px overflow-hidden rounded-lg bg-[#e8e2d8] font-sans shadow-[0_18px_40px_-14px_rgba(0,0,0,0.5)]">
+                  {[["Check in", "Thu 4 Oct"], ["Check out", "Sun 7 Oct"], ["Guests", "2 adults · 1 room"]].map(([k, v]) => (
+                    <span key={k} className="bg-white px-4 py-2.5">
+                      <span className="block text-[9px] font-semibold uppercase tracking-[0.14em] text-[#7b8790]">{k}</span>
+                      <span className="block text-[13px] font-semibold text-[#1d2b33]">{v}</span>
+                    </span>
+                  ))}
+                  <span className="flex h-full items-center bg-[#1d2b33] px-5 text-[12px] font-semibold text-white">Check availability</span>
+                </div>
+              </section>
+
+              {/* Dining, with the table booking that reads the SPEAR floor plan */}
+              <section className="grid h-1/2 grid-cols-[230px_1fr] gap-6 bg-[#faf7f2] px-7 pb-6 pt-16">
+                <div>
+                  <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8a6a2f]">Azure Bistro</p>
+                  <p className="mt-1.5 text-[26px] leading-[1.1] text-[#1d2b33]">Dinner on the terrace</p>
+                  <p className="mt-2 font-sans text-[12px] leading-relaxed text-[#5c6870]">Coastal cooking from 18:00, every night. Pick the table you&apos;d like.</p>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={PHOTO("site-dining")} alt="" className="mt-4 h-[150px] w-full rounded-lg object-cover" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={PHOTO("site-dish")} alt="" className="-mt-10 ml-auto mr-[-10px] h-[86px] w-[86px] rounded-full border-4 border-[#faf7f2] object-cover" />
+                </div>
+                <div data-d="ws-widget" className="flex flex-col rounded-xl bg-white p-5 font-sans shadow-[0_16px_40px_-18px_rgba(29,43,51,0.45)] ring-1 ring-black/5">
+                  <p className="text-[19px] text-[#1d2b33]" style={SERIF}>Reserve a table</p>
+                  <div className="mt-3 grid grid-cols-2 gap-2 text-[12px]">
+                    <span className="rounded-md border border-[#e3ddd2] px-3 py-1.5"><span className="block text-[9px] font-semibold uppercase tracking-[0.12em] text-[#7b8790]">Date</span><span className="font-semibold">Tonight, Thu 4 Oct</span></span>
+                    <span className="rounded-md border border-[#e3ddd2] px-3 py-1.5"><span className="block text-[9px] font-semibold uppercase tracking-[0.12em] text-[#7b8790]">Party</span><span className="font-semibold">4 guests</span></span>
+                  </div>
+                  <div className="mt-2.5 flex gap-1.5 text-[11px] font-semibold">
+                    {["19:00", "19:30", "20:00", "20:30"].map((t) => (
+                      <span key={t} className={`rounded-full px-3 py-1 ${t === "19:30" ? "bg-[#1d2b33] text-white" : t === "20:30" ? "text-[#b3aba0] line-through" : "border border-[#e3ddd2] text-[#1d2b33]"}`}>{t}</span>
+                    ))}
+                  </div>
+                  <p className="mt-3 flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.12em] text-[#7b8790]">
+                    Choose your table
+                    <span className="flex items-center gap-3 normal-case tracking-normal">
+                      <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full border border-[#4e7356] bg-white" /> Free</span>
+                      <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#e7dfd0]" /> Taken</span>
+                    </span>
+                  </p>
+                  <div data-d="ws-plan" className="relative mt-1.5 flex-1 rounded-lg bg-[#f6f2ea]">
+                    <div className="absolute left-4 top-2.5">
+                      <SitePlan scale={0.42} d="ws-t5" site />
+                    </div>
+                    <span className="absolute bottom-2 left-3 text-[9px] font-semibold uppercase tracking-[0.1em] text-[#a39684]">Kitchen</span>
+                    <span className="absolute bottom-2 right-3 text-[9px] font-semibold uppercase tracking-[0.1em] text-[#a39684]">Terrace doors</span>
+                    <span data-d="ws-pick" className={`absolute right-3 top-3 w-[118px] rounded-md bg-white p-2 text-[11px] shadow-sm ring-1 ring-black/5 ${HIDDEN}`}>
+                      <span className="block font-semibold text-[#1d2b33]">Table 5</span>
+                      <span className="block text-[#5c6870]">Seats 4 · by the window</span>
+                    </span>
+                  </div>
+                  <span className="relative mt-3 block">
+                    <span className="flex h-10 items-center justify-center rounded-lg bg-[#ece7de] text-[12px] font-semibold text-[#9a9186]">Choose a table</span>
+                    <span data-d="ws-reserve" className={`absolute inset-0 flex items-center justify-center rounded-lg bg-[#1d2b33] text-[12px] font-semibold text-white ${HIDDEN}`}>Reserve table 5 · 19:30</span>
+                    <span data-d="ws-confirm" className={`absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-[#4e7356] text-[12px] font-semibold text-white ${HIDDEN}`}>
+                      <Check size={14} strokeWidth={3} /> Reserved · confirmation sent to Aris
+                    </span>
+                  </span>
+                </div>
+              </section>
             </div>
           </div>
+        </Card>
+
+        {/* SPEAR, where the plan is drawn */}
+        <Card d="ws-spear" className="flex flex-col p-4">
+          <Label>In SPEAR · Azure Bistro</Label>
+          <p className="mt-0.5 text-[12px] text-taupe">The floor plan your website books from</p>
+          <div data-d="ws-sp-plan" className="mt-3 rounded-md bg-[radial-gradient(circle,rgba(92,79,68,0.12)_1px,transparent_1px)] p-2 [background-size:14px_14px]">
+            <SitePlan scale={0.4} d="ws-sp-t5" site={false} />
+          </div>
+          <Label className="mt-4">Tonight · 19:00 – 20:00</Label>
+          {[["Marchetti", "2 · 19:00 · T-01"], ["Novak", "6 · 19:15 · T-12"]].map(([who, line]) => (
+            <p key={who} className="flex items-center justify-between border-t border-line-soft py-2 text-[12px]">
+              <span><span className="block font-semibold">{who}</span><span className="block text-[11px] text-taupe">{line}</span></span>
+              <Chip tone="brass">Seated</Chip>
+            </p>
+          ))}
+          <p data-d="ws-sp-new" className={`flex items-center justify-between border-t border-line-soft py-2 text-[12px] ${HIDDEN}`}>
+            <span><span className="block font-semibold">Aris</span><span className="block text-[11px] text-taupe">4 · 19:30 · T-05</span></span>
+            <Chip tone="sage">Your website</Chip>
+          </p>
+          <p className="mt-auto flex items-start gap-2 rounded-md bg-parchment/60 p-2.5 text-[11px] leading-snug text-taupe">
+            <RefreshCw size={13} className="mt-0.5 flex-none" /> Move a table here and your website changes with it.
+          </p>
         </Card>
       </div>
-      <Toast d="ws-toast" icon={<Globe size={16} />} title="New photo is live" line="Resized for phones, tablets and desktops" />
     </div>
   );
 }

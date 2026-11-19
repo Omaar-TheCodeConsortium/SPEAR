@@ -141,11 +141,12 @@ export const MODULE_GROUPS: { name: string; modules: ModuleInfo[] }[] = [
         id: "floor",
         name: "Reservations and floor plan",
         line: "Seating a party opens their bill.",
-        uses: ["Your floor plan, drawn in the system", "Guests book tables online", "Seating a party opens their bill, paying clears the table"],
+        uses: ["Your floor plan, drawn in the system", "Guests pick their own table on your website", "Seating a party opens their bill, paying clears the table"],
         links: [
           ["pos", "Opens and closes bills"],
           ["profiles", "Knows returning guests"],
           ["buffet", "Admits buffet parties at the host stand"],
+          ["website", "Your website books from the same plan"],
         ],
       },
       {
@@ -237,11 +238,11 @@ export const MODULE_GROUPS: { name: string; modules: ModuleInfo[] }[] = [
       {
         id: "website",
         name: "Hotel website",
-        line: "Your site, with booking built in.",
-        uses: ["Your own website on your own domain, secure by default", "Swap photos without breaking the layout", "Room and table booking built in"],
+        line: "Your site, booking rooms and tables from SPEAR.",
+        uses: ["Your own website on your own domain, secure by default", "Guests choose their table on the floor plan you drew", "Every booking lands on that plan in SPEAR"],
         links: [
-          ["booking", "Book a room"],
-          ["floor", "Book a table"],
+          ["booking", "Rooms booked commission-free"],
+          ["floor", "Tables booked straight from your floor plan"],
         ],
       },
     ],
